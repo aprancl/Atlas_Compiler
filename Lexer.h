@@ -14,6 +14,7 @@
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 
+// enum more practical than array
 enum TokenType {
     // NAVIGATIONAL TOKENS
     None = -2, // this is just a placeholder for the parser
@@ -66,6 +67,8 @@ enum TokenType {
 
 };
 
+// Note to self: I am making token objects and storing them on the heap. are their constructors being
+// called implicitly or am I creating a massive memory leak ?
 class Token {
 private:
     // data members
@@ -91,7 +94,8 @@ public:
     }
 
 
-    // band-aid solution to minor problem of representing what a given type is...
+    // band-aid solution to minor issue of representing what a given type is...
+    // enum types where prints as numbers not name of type
     static std::string typeToString(int tokenType) {
         std::map<int, std::string> typeMap;
         typeMap[-2] = "None";
@@ -138,10 +142,11 @@ public:
 
 };
 
-// in c++ class members are private by default
+
 class Lexer { // this is the main portion of the lexer class
 
 private:
+    // in c++ class members are private by default
     std::string source;
     std::string curChar;
     std::string lastChar;
@@ -225,12 +230,11 @@ public:
 
 //methods
 
-// return the next token
+// return the next token // this is the "meat" of the lexer // eventually will be controlled by the parser
     Token getToken() {
-        Token *token;
+        Token *token; // pointer to an eventual token object existing on the heap
 
         // length 1 tokens (mostly basic math operators, parenthesis, and such )
-
         if (curChar == " ") { // we want to skip white space
             token = new Token(curChar, Space);
         } else if (curChar == "+") {
@@ -311,9 +315,9 @@ public:
             nextChar();
             std::string str = "";
             while (curChar != "\"") {
-                if (curChar != "\\") { // illegal characters // basically just no escape sequences
+                if (curChar != "\\") { // illegal characters for now // will add escape sequences later
                     if (curChar == "\0") { // make sure that the string literal is closed
-                        printf(ANSI_COLOR_MAGENTA "Lexing error..expected another <\"> to close string literal <\"%s>",
+                        printf(ANSI_COLOR_MAGENTA "\nLexing error..expected another <\"> to close string literal <\"%s>",
                                str.substr(0, str.length() - 1).c_str());
                         exit(25);
                     }
@@ -373,6 +377,8 @@ public:
         return *token;
     }
 
+
+    // navigational methods
 // get the next character in the sequence of characters
     void nextChar() {
         // increment our space by one
