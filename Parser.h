@@ -294,6 +294,21 @@ private:
                 statement();
             }
             EOCB();
+        } else if (compareToCurToken(For)) {
+            std::cout << "(STATEMENT)-FOR_LOOP\n";
+
+            advanceToken();
+            skipWhiteSpaces();
+            match(SqrbraceL);
+            match(IntLiteral);
+            match(SqrbraceR);
+            match(CrlbraceL);
+            // execute all statements in the code block
+            while (!compareToCurToken(CrlbraceR)) {
+                statement();
+            }
+            EOCB();
+
         } else if (compareToCurToken(Input)) {
             std::cout << "(STATEMENT)-INPUT\n";
             advanceToken();

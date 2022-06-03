@@ -41,6 +41,7 @@ enum TokenType {
     If = 101,
     Input = 102,
     While = 104,
+    For = 105,
 
     // Objects
     IntLiteral = 2,
@@ -129,6 +130,7 @@ public:
         typeMap[102] = "Input";
         typeMap[103] = "Cc";
         typeMap[104] = "While";
+        typeMap[105] = "For";
 
         return typeMap[tokenType];
     }
@@ -167,7 +169,7 @@ private:
 
 
     int isKeyWord(std::string text) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "INT"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "INT", "FOR"};
 
         for (std::string keyWord: key_words) {
             if (keyWord == text) {
@@ -179,7 +181,7 @@ private:
     }
 
     TokenType getThisKeyword(std::string tokenText) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "INT"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "INT", "FOR"};
 
         if (tokenText == key_words[0]) {
             return Write;
@@ -193,6 +195,8 @@ private:
             return StringKW;
         } else if (tokenText == key_words[5]) {
             return IntKW;
+        } else if (tokenText == key_words[6]) {
+            return For;
         } else {
             return None; // this shouldn't happen
         }
@@ -200,22 +204,28 @@ private:
 
 
 public:
-    // constructors
+
+// constructors
     Lexer() {
         curPosition = -1;
         this->nextChar();
     }
 
-    Lexer(std::string source) {
-        this->source = source + "\n";
+    Lexer(std::string
+          source) {
+        this->
+                source = source + "\n";
         curChar = "";
         curPosition = -1;
-        this->nextChar();
+        this->
+
+                nextChar();
+
     }
 
-    //methods
+//methods
 
-    // return the next token
+// return the next token
     Token getToken() {
         Token *token;
 

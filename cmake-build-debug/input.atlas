@@ -10,5 +10,8 @@ WHILE [x == 1]{
     WRITE "Hello world";
 };
 
+FOR [10]{
+    WRITE "thing";
+};
 
-WRITE 1 + 1;
+
