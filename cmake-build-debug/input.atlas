@@ -1,9 +1,14 @@
 
 WRITE "Hello world";
 
+
+
 IF [x != 1]{
     STRING name = "Erick";
     INT age = 9 * 2 + 1;
+    IF [ 1 == 1 ]{
+        WRITE "I hope this parses!";
+    };
 };
 
 WHILE [x == 1]{
