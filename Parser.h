@@ -7,6 +7,7 @@
 
 #include "Lexer.h"
 #include <stdio.h>
+#include <vector>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
@@ -19,6 +20,7 @@ class Parser {
     Lexer lexer;
     Token curToken;
     Token nextToken;
+    std::vector<std::string> declared_vars;
 
 public:
     // constructors
@@ -38,6 +40,22 @@ public:
 private:
 
     // helper methods
+
+    bool isUsedIdentifier(std::string tokenText) {
+        if (this->declared_vars.size() == 0) {
+            return 0;
+
+        } else {
+            for (std::string var: declared_vars) {
+                if (tokenText == var) {
+                    return 1;
+                }
+            }
+            return 0;
+
+        }
+
+    }
 
     bool isComparisonOperator(Token token) {
         return (token.getType() == EqEq || token.getType() == NotEq || token.getType() == GtEq ||
@@ -76,6 +94,14 @@ private:
             printf(ANSI_COLOR_CYAN "Parsing error..expected <%s> but got <%s>\n", Token::typeToString(type).c_str(),
                    Token::typeToString(this->curToken.getType()).c_str());
             exit(35); //  stop program && lexical analysis
+        } else if (compareToCurToken(Identifier)) {
+            if (!isUsedIdentifier(curToken.getTokenText())) {
+                declared_vars.push_back(curToken.getTokenText());
+            } else {
+                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable before assignment\n", Token::typeToString(type).c_str(),
+                       Token::typeToString(this->curToken.getType()).c_str());
+                exit(35)
+            }
         } else {
             advanceToken();
             skipWhiteSpaces();

@@ -1,6 +1,5 @@
 
-WRITE "Hello world";
-
+INT x = 10;
 
 
 IF [x != 1]{
@@ -18,5 +17,7 @@ WHILE [x == 1]{
 FOR [10]{
     WRITE "thing";
 };
+
+INPUT number;
 
 
