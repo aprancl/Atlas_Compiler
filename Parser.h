@@ -364,6 +364,19 @@ private:
             skipWhiteSpaces();
             match(Identifier);
             EOS();
+        } else if (compareToCurToken(Identifier)) {
+            match(Identifier);
+            match(Eq);
+            if (compareToCurToken(StringLiteral)) {
+                match(StringLiteral);
+                EOS();
+            } else if (compareToCurToken(IntLiteral)) {
+                match(IntLiteral);
+                EOS();
+            } else {
+                //This should be a parsing error about assigning string to int or int to string");
+                //somehow need to check A) What type the ariable is and B) if the literal matches that type
+            }
         } else {
             printf(ANSI_COLOR_CYAN "Parsing error..invalid statement on line: %d ...\n%s <-*", lexer.getCurLineNumber(),
                    lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());

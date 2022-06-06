@@ -5,4 +5,4 @@ STRING name = "Anthony";
 WRITE names; CC this does compile but shouldn't
 
 INT x= 4;
-INT x = 5;
+x = 5;
