@@ -106,7 +106,7 @@ private:
                 exit(35);
             }
         } else {
-            advanceToken(); 
+            advanceToken();
             skipWhiteSpaces();
         }
     }
@@ -162,9 +162,17 @@ private:
             advanceToken();
             skipWhiteSpaces();
         } else {
-            printf(ANSI_COLOR_CYAN "Parsing error..unexpected token in expression <%s>",
-                   curToken.getTokenText().c_str());
-            exit(35);
+
+            if (compareToCurToken(StringLiteral)) {
+                printf(ANSI_COLOR_CYAN "Parsing error..cannot use string literals in calculations..line number: %d",
+                       lexer.getCurLineNumber());
+                exit(35);
+            } else {
+                printf(ANSI_COLOR_CYAN "Parsing error..unexpected token in expression <%s>..line number: %d",
+                       curToken.getTokenText().c_str(), lexer.getCurLineNumber());
+                exit(35);
+            }
+
         }
 
 
@@ -355,7 +363,7 @@ private:
             match(Identifier);
             EOS();
         } else {
-            printf(ANSI_COLOR_CYAN "Parsing error..invalid statement...\n%s <-*",
+            printf(ANSI_COLOR_CYAN "Parsing error..invalid statement on line: %d ...\n%s <-*", lexer.getCurLineNumber(),
                    lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());
             exit(36);
         }

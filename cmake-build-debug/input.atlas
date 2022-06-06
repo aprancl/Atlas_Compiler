@@ -22,4 +22,6 @@ FOR [10]{
 
 INPUT number;
 
+INT a = "Anthony";
+
 
