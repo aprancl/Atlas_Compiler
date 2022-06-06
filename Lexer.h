@@ -32,8 +32,8 @@ enum TokenType {
 
 
     // DATA TYPES
-    IntKW = 25, // perhaps just make everything floats and call this token NUM
-    DeciKW = 50,
+    IntKW = 25, // this will need to be refactored to keyword NUM
+    FloKW = 50,
     StringKW = 75,
 
     // KEYWORDS...
@@ -47,6 +47,7 @@ enum TokenType {
     // Objects
     IntLiteral = 2,
     StringLiteral = 3,
+    FloatLiteral = 7,
     Identifier = 4,
     Comment = 6, // sort of a keyword but it doesn't really do anything
 
@@ -107,6 +108,7 @@ public:
         typeMap[4] = "Identifier";
         typeMap[5] = "Eos";
         typeMap[6] = "Comment";
+        typeMap[7] = "FloatLiteral";
         typeMap[201] = "ParenthR";
         typeMap[200] = "ParenthL";
         typeMap[301] = "ClrbraceR";
@@ -125,7 +127,7 @@ public:
         typeMap[19] = "GtEq";
         typeMap[20] = "LtEq";
         typeMap[25] = "IntKW";
-        typeMap[50] = "DeciKW";
+        typeMap[50] = "FloKW";
         typeMap[75] = "StringKW";
         typeMap[99] = "Keyword";
         typeMap[199] = "Bslash";
@@ -235,35 +237,35 @@ public:
         Token *token; // pointer to an eventual token object existing on the heap
 
         // length 1 tokens (mostly basic math operators, parenthesis, and such )
-        if (curChar == " ") { // we want to skip white space
+        if (curChar == " ") { // we want to skip white space // spaces
             token = new Token(curChar, Space);
-        } else if (curChar == "+") {
+        } else if (curChar == "+") { // addition
             token = new Token(curChar, Plus);
-        } else if (curChar == "-") {
+        } else if (curChar == "-") { // subtraction
             token = new Token(curChar, Minus);
-        } else if (curChar == "*") {
+        } else if (curChar == "*") { // multiplication
             token = new Token(curChar, Asterisk);
-        } else if (curChar == "/") {
+        } else if (curChar == "/") { // division
             token = new Token(curChar, Fslash);
-        } else if (curChar == "\\") {
+        } else if (curChar == "\\") { // backslash
             token = new Token(curChar, Bslash);
-        } else if (curChar == ";") {
+        } else if (curChar == ";") { // colon EOS
             token = new Token(curChar, Eos);
-        } else if (curChar == "(") {
+        } else if (curChar == "(") { // right parentheses
             token = new Token(curChar, ParenthL);
-        } else if (curChar == ")") {
+        } else if (curChar == ")") { // left parentheses
             token = new Token(curChar, ParenthR);
-        } else if (curChar == "[") {
+        } else if (curChar == "[") { // right square brace
             token = new Token(curChar, SqrbraceL);
-        } else if (curChar == "]") {
+        } else if (curChar == "]") { // left square brace
             token = new Token(curChar, SqrbraceR);
-        } else if (curChar == "{") {
+        } else if (curChar == "{") { // right curly bracket
             token = new Token(curChar, CrlbraceL);
-        } else if (curChar == "}") {
+        } else if (curChar == "}") { // left curly bracket
             token = new Token(curChar, CrlbraceR);
         }
             // length 2 tokens (mostly boolean comparison operators)
-        else if (curChar == "=") {
+        else if (curChar == "=") { // equals and equal-equals
             if (lookAhead() == "=") {
                 lastChar = curChar;
                 nextChar();
@@ -271,7 +273,7 @@ public:
             } else {
                 token = new Token(curChar, Eq);
             }
-        } else if (curChar == ">") {
+        } else if (curChar == ">") { // greater than and greater to or equal to
             if (lookAhead() == "=") {
                 lastChar = curChar;
                 nextChar();
@@ -279,7 +281,7 @@ public:
             } else {
                 token = new Token(curChar, Gt);
             }
-        } else if (curChar == "<") {
+        } else if (curChar == "<") {// less than and less than or equal to
             if (lookAhead() == "=") {
                 lastChar = curChar;
                 nextChar();
@@ -287,7 +289,7 @@ public:
             } else {
                 token = new Token(curChar, Lt);
             }
-        } else if (curChar == "!") {
+        } else if (curChar == "!") { // not equals
             if (lookAhead() == "=") {
                 lastChar = curChar;
                 nextChar();
@@ -330,7 +332,7 @@ public:
             }
             token = new Token(str, StringLiteral);
 
-        } else if (isDigit(curChar.c_str()) == 1) { // Integers and numbers
+        } else if (isDigit(curChar.c_str()) == 1) { // Integers
             std::string num = "";
             while (isDigit(curChar.c_str()) == 1) {
                 num.append(curChar);
@@ -340,7 +342,35 @@ public:
             token = new Token(num, IntLiteral);
             // we have to go back one before we exit this part of the decision structure
 
-        } else if (isalpha(curChar[0])) {
+        } else if (curChar == "f" && lookAhead() == "l") { // floats
+
+            // skip characters <f> and <l> as they just mark the start of a float
+            nextChar();
+            nextChar();
+
+            std::string float_literal = "";
+
+            int decimal_counter = 0;
+            while (isDigit(curChar.c_str()) || curChar == ".") {
+
+                if (curChar == ".") {
+                    decimal_counter++;
+                }
+
+                float_literal.append(curChar);
+                nextChar();
+
+            }
+
+            if (decimal_counter > 1) {
+                printf(ANSI_COLOR_MAGENTA "\nLexing error..cannot use more than one decimal per float literal.. <%s> ..line number: %d\n",
+                       float_literal.c_str(), curLineNum);
+            }
+            else {
+                token = new Token(float_literal, FloatLiteral);
+            }
+
+        } else if (isalpha(curChar[0])) { // Keywords and identifiers
             std::string tokenText = "";
 
             while (isalnum(curChar[0])) {
@@ -367,14 +397,13 @@ public:
         } else if (curChar == "\0") {
             token = new Token(curChar, Eof);
         } else {
-            printf(ANSI_COLOR_MAGENTA "\nLexing error..unknown token <%s> at line number: %d", curChar.c_str(), curLineNum);
+            printf(ANSI_COLOR_MAGENTA "\nLexing error..unknown token <%s> at line number: %d", curChar.c_str(),
+                   curLineNum);
             exit(25); //  stop program && lexical analysis
         }
 
-        // move the lexer from the end of this token to the beginning of the next (ideally)
-        // for now, just go ahead by one because all of our tokens are len of 1
+        // leave the lexer at the start of the next token
         nextChar();
-
         return *token;
     }
 
@@ -419,7 +448,8 @@ public:
     std::string getSource() {
         return source;
     }
-    int getCurLineNumber(){
+
+    int getCurLineNumber() {
         return curLineNum;
     }
 

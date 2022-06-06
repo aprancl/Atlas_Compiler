@@ -1,8 +1,2 @@
-CC this is a comment
 
-
-STRING name = "Anthony";
-WRITE names; CC this does compile but shouldn't
-
-INT x= 4;
-x = 5;
+INT x = 5;
