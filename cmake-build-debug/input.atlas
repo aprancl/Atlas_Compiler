@@ -1,12 +1,14 @@
 
 INT x = 10;
 
-
 IF [x != 1]{
     STRING name = "Erick";
     INT age = 9 * 2 + 1;
     IF [ 1 == 1 ]{
         WRITE "I hope this parses!";
+        FOR [10] {
+            WRITE "Hello";
+        };
     };
 };
 

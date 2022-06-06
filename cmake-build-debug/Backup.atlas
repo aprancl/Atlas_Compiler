@@ -31,3 +31,9 @@ WHILE [x == 1]{
 };
 
 WRITE "program complete!";
+
+
+
+CC bad for loop
+
+

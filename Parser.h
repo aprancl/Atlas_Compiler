@@ -91,19 +91,22 @@ private:
 
     void match(TokenType type) {//                      used to check tokens within a statement
         if (!(compareToCurToken(type))) {
-            printf(ANSI_COLOR_CYAN "Parsing error..expected <%s> but got <%s>\n", Token::typeToString(type).c_str(),
+            printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s>\n", Token::typeToString(type).c_str(),
                    Token::typeToString(this->curToken.getType()).c_str());
             exit(35); //  stop program && lexical analysis
         } else if (compareToCurToken(Identifier)) {
             if (!isUsedIdentifier(curToken.getTokenText())) {
                 declared_vars.push_back(curToken.getTokenText());
+                advanceToken();
+                skipWhiteSpaces();
             } else {
-                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable before assignment\n", Token::typeToString(type).c_str(),
+                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable before assignment\n", // <-* ended here
+                       Token::typeToString(type).c_str(),
                        Token::typeToString(this->curToken.getType()).c_str());
-                exit(35)
+                exit(35);
             }
         } else {
-            advanceToken();
+            advanceToken(); 
             skipWhiteSpaces();
         }
     }

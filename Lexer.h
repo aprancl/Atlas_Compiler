@@ -151,6 +151,7 @@ private:
     std::string curChar;
     std::string lastChar;
     int curPosition;
+    int curLineNum;
 
 
     //  <> some private helper methods <>
@@ -214,17 +215,16 @@ public:
     Lexer() {
         curPosition = -1;
         this->nextChar();
+        curLineNum = 1;
     }
 
     Lexer(std::string
           source) {
-        this->
-                source = source + "\n";
+        this->source = source + "\n";
         curChar = "";
         curPosition = -1;
-        this->
-
-                nextChar();
+        this->nextChar();
+        curLineNum = 1;
 
     }
 
@@ -362,11 +362,12 @@ public:
 
             // navigational tokens
         else if (curChar == "\n") {
+            curLineNum++;
             token = new Token(curChar, NewLine);
         } else if (curChar == "\0") {
             token = new Token(curChar, Eof);
         } else {
-            printf(ANSI_COLOR_MAGENTA "Lexing error..unknown token <%s>", curChar.c_str());
+            printf(ANSI_COLOR_MAGENTA "\nLexing error..unknown token <%s> at line number: %d", curChar.c_str(), curLineNum);
             exit(25); //  stop program && lexical analysis
         }
 
@@ -417,6 +418,9 @@ public:
 
     std::string getSource() {
         return source;
+    }
+    int getCurLineNumber(){
+        return curLineNum;
     }
 
 };
