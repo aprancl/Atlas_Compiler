@@ -32,7 +32,7 @@ enum TokenType {
 
 
     // DATA TYPES
-    IntKW = 25, // this will need to be refactored to keyword NUM
+    NumKW = 25, // this will need to be refactored to keyword NUM
     FloKW = 50,
     StringKW = 75,
 
@@ -177,7 +177,7 @@ private:
 
 
     int isKeyWord(std::string text) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "INT", "FOR"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR"};
 
         for (std::string keyWord: key_words) {
             if (keyWord == text) {
@@ -189,7 +189,7 @@ private:
     }
 
     TokenType getThisKeyword(std::string tokenText) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "INT", "FOR"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR"};
 
         if (tokenText == key_words[0]) {
             return Write;
@@ -202,7 +202,7 @@ private:
         } else if (tokenText == key_words[4]) {
             return StringKW;
         } else if (tokenText == key_words[5]) {
-            return IntKW;
+            return NumKW;
         } else if (tokenText == key_words[6]) {
             return For;
         } else {

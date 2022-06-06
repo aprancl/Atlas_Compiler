@@ -157,7 +157,7 @@ private:
         printf("PRIMARY [%s -> %s]\n", Token::typeToString(curToken.getType()).c_str(),
                curToken.getTokenText().c_str());
 
-        if (compareToCurToken(IntLiteral)) {
+        if (compareToCurToken(IntLiteral) || compareToCurToken(FloatLiteral)) {
             advanceToken();
             skipWhiteSpaces();
         } else if (compareToCurToken(Identifier)) {
@@ -289,7 +289,7 @@ private:
 
             EOS();
 
-        } else if (compareToCurToken(IntKW)) { // variable assignment of type int
+        } else if (compareToCurToken(NumKW)) { // variable assignment of type int
             std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_INT";
 
             advanceToken();
