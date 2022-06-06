@@ -94,13 +94,15 @@ private:
             printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s>\n", Token::typeToString(type).c_str(),
                    Token::typeToString(this->curToken.getType()).c_str());
             exit(35); //  stop program && lexical analysis
-        } else if (compareToCurToken(Identifier)) {
+        } else if (compareToCurToken(
+                Identifier)) { // identifiers need to be handled such that duplicates are not allowed
             if (!isUsedIdentifier(curToken.getTokenText())) {
                 declared_vars.push_back(curToken.getTokenText());
                 advanceToken();
                 skipWhiteSpaces();
             } else {
-                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable before assignment\n", // <-* ended here
+                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d\nexpected token(s) <%s> but got <%s>",
+                       lexer.getCurLineNumber() + 2,// <-* ended here
                        Token::typeToString(type).c_str(),
                        Token::typeToString(this->curToken.getType()).c_str());
                 exit(35);

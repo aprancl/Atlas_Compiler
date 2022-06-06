@@ -3,7 +3,6 @@ INT x = 5;
 CC XYZ
 CC ABCs
 STRING name = "Anthony";
-WRITE "Hello World";
 
 STRING msg = "Anthony";
 WRITE "Hello, world!";
@@ -12,17 +11,9 @@ CC probably "hardest" statement to parse
 INT foo = bar * 3 + 2;
 INT x = 1;
 
-
-INT x = 5 * 5  + 2;
-
-IF [ x >= 10 ] {
-    WRITE "Hola amigo!";
-    STRING name = "Anthony";
-};
-
-
 IF [x != 1]{
     STRING name = "Erick";
+    WRITE "Hola amigo!";
     INT age = 9 * 2 + 1;
 };
 
@@ -30,10 +21,13 @@ WHILE [x == 1]{
     WRITE "Hello world";
 };
 
-WRITE "program complete!";
-
-
-
-CC bad for loop
-
-
+IF [x != 1]{
+    STRING name = "Erick";
+    INT age = 9 * 2 + 1;
+    IF [ 1 == 1 ]{
+        WRITE "I hope this parses!";
+        FOR [10] {
+            WRITE "Hello";
+        };
+    };
+};

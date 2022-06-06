@@ -1,27 +1,8 @@
-
-INT x = 10;
-
-IF [x != 1]{
-    STRING name = "Erick";
-    INT age = 9 * 2 + 1;
-    IF [ 1 == 1 ]{
-        WRITE "I hope this parses!";
-        FOR [10] {
-            WRITE "Hello";
-        };
-    };
-};
-
-WHILE [x == 1]{
-    WRITE "Hello world";
-};
-
-FOR [10]{
-    WRITE "thing";
-};
-
-INPUT number;
-
-INT a = "Anthony";
+CC this is a comment
 
 
+STRING name = "Anthony";
+WRITE names; CC this does compile but shouldn't
+
+INT x= 4;
+INT x = 5;
