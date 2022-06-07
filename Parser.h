@@ -50,7 +50,8 @@ private:
 
         } else {
             for (std::string var: declared_vars) {
-                if (tokenText == var) {
+                if (tokenText == var.substr(2)) {
+                    int x = 5;
                     return 1;
                 }
             }
@@ -114,6 +115,7 @@ private:
 
 
     void advanceToken() {
+
         lastToken = curToken;
         curToken = nextToken;
 
@@ -133,12 +135,18 @@ private:
                    Token::typeToString(this->curToken.getType()).c_str(), lexer.getCurLineNumber());
             exit(35); //  stop program && lexical analysis
         } else if (compareToCurToken(Identifier)) {
-            declared_vars.push_back(curToken.getTokenText());
-            advanceToken();
 
+            // if we are declaring a variable, we want to document it // else just continue
+            if (lastToken.getType() == NumKW) {
+                std::string token_text = "N_" + curToken.getTokenText();
+                declared_vars.push_back(token_text);
+            } else if (lastToken.getType() == StringKW) {
+                std::string token_text = "S_" + curToken.getTokenText();
+                declared_vars.push_back(token_text);
+            }
+            advanceToken();
         } else {
             advanceToken();
-
         }
     }
 
@@ -323,6 +331,11 @@ private:
 
             advanceToken();
 
+            if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
+                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d",
+                       lexer.getCurLineNumber());
+                exit(35);
+            }
 
             match(Identifier);
             match(Eq);
