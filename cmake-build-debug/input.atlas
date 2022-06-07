@@ -1,4 +1,4 @@
 
 
 NUM a = 1;
-NUM x = fl5.0 + 7 / 1;
+NUM x = fl5.0 + 7 / a;

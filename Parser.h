@@ -41,6 +41,7 @@ private:
 
     // helper methods
 
+
     bool isUsedIdentifier(std::string tokenText) {
         if (this->declared_vars.size() == 0) {
             return 0;
@@ -55,6 +56,32 @@ private:
 
         }
 
+    }
+
+
+    void isValidIdentifier() {
+
+        if (compareToCurToken(
+                Identifier)) { // identifiers need to be handled such that duplicates are not allowed
+
+            if (!isUsedIdentifier(curToken.getTokenText())) {
+                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable <%s> before assignment");
+            }
+
+
+            // this system removes duplicates, but which is good, but it doesn't belong here
+//            if (!isUsedIdentifier(curToken.getTokenText())) {
+//                declared_vars.push_back(curToken.getTokenText());
+//                advanceToken();
+//                skipWhiteSpaces();
+//            } else { // in the case that the variable has already been used
+//                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d\nexpected token(s) <%s> but got <%s>",
+//                       lexer.getCurLineNumber() + 2,// <-* ended here
+//                       Token::typeToString(type).c_str(),
+//                       Token::typeToString(this->curToken.getType()).c_str());
+//                exit(35);
+//            }
+        }
     }
 
     bool isComparisonOperator(Token token) {
@@ -91,22 +118,10 @@ private:
 
     void match(TokenType type) {//                      used to check tokens within a statement
         if (!(compareToCurToken(type))) {
-            printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s>\n", Token::typeToString(type).c_str(),
-                   Token::typeToString(this->curToken.getType()).c_str());
+            printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s> ..line number: %d\n",
+                   Token::typeToString(type).c_str(),
+                   Token::typeToString(this->curToken.getType()).c_str(), lexer.getCurLineNumber());
             exit(35); //  stop program && lexical analysis
-        } else if (compareToCurToken(
-                Identifier)) { // identifiers need to be handled such that duplicates are not allowed
-            if (!isUsedIdentifier(curToken.getTokenText())) {
-                declared_vars.push_back(curToken.getTokenText());
-                advanceToken();
-                skipWhiteSpaces();
-            } else {
-                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d\nexpected token(s) <%s> but got <%s>",
-                       lexer.getCurLineNumber() + 2,// <-* ended here
-                       Token::typeToString(type).c_str(),
-                       Token::typeToString(this->curToken.getType()).c_str());
-                exit(35);
-            }
         } else {
             advanceToken();
             skipWhiteSpaces();
@@ -235,10 +250,10 @@ private:
     }
 
     // statement ::= "WRITE" (expression || TK.StringLiteral) TK.Eos || etc...
-    void statement() {
+    void statement() { // this is the meat of the parser
 
         // for print (STATEMENT)
-        if (compareToCurToken(Write)) { // simple print statement
+        if (compareToCurToken(Write)) { //  System.out.println() statement
             std::cout << "(STATEMENT)-WRITE\n";
             advanceToken(); // the next token is a space, and it gets stuck
 
@@ -289,8 +304,8 @@ private:
 
             EOS();
 
-        } else if (compareToCurToken(NumKW)) { // variable assignment of type int
-            std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_INT";
+        } else if (compareToCurToken(NumKW)) { // variable assignment of type int and float
+            std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_NUM";
 
             advanceToken();
             skipWhiteSpaces();
@@ -300,13 +315,13 @@ private:
             expression();
             EOS();
 
-        } else if (compareToCurToken(Comment)) { // just a comment
+        } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";
             advanceToken();
             skipWhiteSpaces();
 
 
-        } else if (compareToCurToken(If)) {
+        } else if (compareToCurToken(If)) { // if statements
             std::cout << "(STATEMENT)-IF_CONDITION\n";
             advanceToken();
             skipWhiteSpaces();
@@ -320,7 +335,7 @@ private:
             }
             EOCB();
 
-        } else if (compareToCurToken(While)) {
+        } else if (compareToCurToken(While)) { // while loops
             std::cout << "(STATEMENT)-WHILE_LOOP\n";
             advanceToken();
             skipWhiteSpaces();
@@ -333,7 +348,7 @@ private:
                 statement();
             }
             EOCB();
-        } else if (compareToCurToken(For)) {
+        } else if (compareToCurToken(For)) { // for loops
             std::cout << "(STATEMENT)-FOR_LOOP";
 
             advanceToken();
@@ -341,7 +356,7 @@ private:
             match(SqrbraceL);
 
             if (compareToCurToken(IntLiteral)) {
-                std::cout << "..INT_LITERAL\n";
+                std::cout << "..NUM_LITERAL\n";
                 advanceToken();
                 skipWhiteSpaces();
             } else if (compareToCurToken(Identifier)) {
@@ -358,24 +373,33 @@ private:
             }
             EOCB();
 
-        } else if (compareToCurToken(Input)) {
+        } else if (compareToCurToken(Input)) { // input statements
             std::cout << "(STATEMENT)-INPUT\n";
             advanceToken();
             skipWhiteSpaces();
             match(Identifier);
             EOS();
-        } else if (compareToCurToken(Identifier)) {
+        } else if (compareToCurToken(
+                Identifier)) { // variable re-instantiation // x = 5; as opposed to the already declared NUM x = 4;
             match(Identifier);
             match(Eq);
-            if (compareToCurToken(StringLiteral)) {
-                match(StringLiteral);
-                EOS();
-            } else if (compareToCurToken(IntLiteral)) {
-                match(IntLiteral);
+
+            // check to see if the variable has already been declared (should be, else return parsing error)
+            if (!isUsedIdentifier(curToken.getTokenText())) {
+                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable <%s> before assignment..line number: %d",
+                       curToken.getTokenText().c_str(), lexer.getCurLineNumber());
+                exit(35);
+            }
+            TokenType type = curToken.getType();
+
+            // thinking about it, this will not work, and will probably need to be changed on account that it allows any data type to be assigned to any variable
+            if (curToken.getType() == StringLiteral || curToken.getType() == IntLiteral ||
+                curToken.getType() == FloatLiteral) {
+                match(type);
                 EOS();
             } else {
-                //This should be a parsing error about assigning string to int or int to string");
-                //somehow need to check A) What type the ariable is and B) if the literal matches that type
+                //This should be a parsing error about assigning string to int or int to string
+                //somehow need to check A) What type the variable is and B) if the literal matches that type
             }
         } else {
             printf(ANSI_COLOR_CYAN "Parsing error..invalid statement on line: %d ...\n%s <-*", lexer.getCurLineNumber(),
@@ -383,13 +407,12 @@ private:
             exit(36);
         }
 
-
     }
 
 
 public:
 
-    // program ::= {statement}
+// program ::= {statement}
     void program() {
         std::cout << "PROGRAM\n";
 
