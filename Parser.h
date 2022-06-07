@@ -96,12 +96,12 @@ private:
                 token.getType() == Fslash);
     }
 
-    void skipWhiteSpaces() {
-
-        while (compareToCurToken(Space) || compareToCurToken(NewLine)) {
-            advanceToken();
-        }
-    }
+//    void skipWhiteSpaces() {
+//
+//        while (compareToCurToken(Space) || compareToCurToken(NewLine)) {
+//            advanceToken();
+//        }
+//    }
 
     // compare a given token to what the current token is
     bool compareToCurToken(TokenType type) { //             used to check the first token of each statement
@@ -116,7 +116,14 @@ private:
     void advanceToken() {
         lastToken = curToken;
         curToken = nextToken;
-        nextToken = lexer.getToken();
+
+        // potential next token
+        Token nToken = lexer.getToken();
+        // filter out all spaces and newlines
+        while (nToken.getType() == Space || nToken.getType() == NewLine) {
+            nToken = lexer.getToken();
+        }
+        nextToken = nToken;
     }
 
     void match(TokenType type) {//                      used to check tokens within a statement
@@ -128,10 +135,10 @@ private:
         } else if (compareToCurToken(Identifier)) {
             declared_vars.push_back(curToken.getTokenText());
             advanceToken();
-            skipWhiteSpaces();
+
         } else {
             advanceToken();
-            skipWhiteSpaces();
+
         }
     }
 
@@ -150,7 +157,7 @@ private:
         if (compareToCurToken(CrlbraceR) && compareToNextToken(Eos)) {
             advanceToken();
             advanceToken();
-            skipWhiteSpaces();
+
 
         } else {
             printf(ANSI_COLOR_CYAN "Parsing error..reached end of file before code block terminated");
@@ -174,17 +181,17 @@ private:
     // parsing through expressions
 
     void primary() {
-        skipWhiteSpaces();
+
 
         printf("PRIMARY [%s -> %s]\n", Token::typeToString(curToken.getType()).c_str(),
                curToken.getTokenText().c_str());
 
         if (compareToCurToken(IntLiteral) || compareToCurToken(FloatLiteral)) {
             advanceToken();
-            skipWhiteSpaces();
+
         } else if (compareToCurToken(Identifier)) {
             advanceToken();
-            skipWhiteSpaces();
+
         } else {
 
             if (compareToCurToken(StringLiteral)) {
@@ -266,7 +273,7 @@ private:
 
 
             // skip extra white space
-            skipWhiteSpaces();
+
 
             // search for string literal, identifier, or  expression
             if (compareToCurToken(StringLiteral)) {
@@ -277,7 +284,7 @@ private:
                 expression(); // if we didn't find a string, we will want to print this expression
             }
 
-            skipWhiteSpaces();
+
             // check for the final EOS statement
             //match(Eos);
 
@@ -292,18 +299,18 @@ private:
             std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_STRING";
 
             advanceToken();
-            skipWhiteSpaces();
+
 
             match(Identifier);
             match(Eq);
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n";
                 advanceToken();
-                skipWhiteSpaces();
+
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n";
                 advanceToken();
-                skipWhiteSpaces();
+
             } else {
                 printf(ANSI_COLOR_CYAN "Parsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
                 exit(35);
@@ -315,7 +322,7 @@ private:
             std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_NUM";
 
             advanceToken();
-            skipWhiteSpaces();
+
 
             match(Identifier);
             match(Eq);
@@ -325,13 +332,12 @@ private:
         } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";
             advanceToken();
-            skipWhiteSpaces();
 
 
         } else if (compareToCurToken(If)) { // if statements
             std::cout << "(STATEMENT)-IF_CONDITION\n";
             advanceToken();
-            skipWhiteSpaces();
+
             match(SqrbraceL);
             comparison();
             match(SqrbraceR);
@@ -345,7 +351,7 @@ private:
         } else if (compareToCurToken(While)) { // while loops
             std::cout << "(STATEMENT)-WHILE_LOOP\n";
             advanceToken();
-            skipWhiteSpaces();
+
             match(SqrbraceL);
             comparison();
             match(SqrbraceR);
@@ -359,17 +365,17 @@ private:
             std::cout << "(STATEMENT)-FOR_LOOP";
 
             advanceToken();
-            skipWhiteSpaces();
+
             match(SqrbraceL);
 
             if (compareToCurToken(IntLiteral)) {
                 std::cout << "..NUM_LITERAL\n";
                 advanceToken();
-                skipWhiteSpaces();
+
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n";
                 advanceToken();
-                skipWhiteSpaces();
+
             }
 
             match(SqrbraceR);
@@ -383,7 +389,7 @@ private:
         } else if (compareToCurToken(Input)) { // input statements
             std::cout << "(STATEMENT)-INPUT\n";
             advanceToken();
-            skipWhiteSpaces();
+
             match(Identifier);
             EOS();
         }
@@ -425,7 +431,7 @@ public:
     void program() {
         std::cout << "PROGRAM\n";
 
-        skipWhiteSpaces();
+
 
         // parse through all given statements
         while (!(compareToCurToken(Eof))) {
