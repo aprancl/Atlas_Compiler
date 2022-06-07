@@ -18,6 +18,7 @@ class Parser {
 
 
     Lexer lexer;
+    Token lastToken;
     Token curToken;
     Token nextToken;
     std::vector<std::string> declared_vars;
@@ -29,6 +30,7 @@ public:
 
     Parser(Lexer lexer) {
         this->lexer = lexer;
+        lastToken = Token("", None);
         curToken = Token("", None);
         nextToken = Token("", None);
         advanceToken();
@@ -112,6 +114,7 @@ private:
 
 
     void advanceToken() {
+        lastToken = curToken;
         curToken = nextToken;
         nextToken = lexer.getToken();
     }
@@ -122,6 +125,10 @@ private:
                    Token::typeToString(type).c_str(),
                    Token::typeToString(this->curToken.getType()).c_str(), lexer.getCurLineNumber());
             exit(35); //  stop program && lexical analysis
+        } else if (compareToCurToken(Identifier)) {
+            declared_vars.push_back(curToken.getTokenText());
+            advanceToken();
+            skipWhiteSpaces();
         } else {
             advanceToken();
             skipWhiteSpaces();
@@ -379,14 +386,15 @@ private:
             skipWhiteSpaces();
             match(Identifier);
             EOS();
-        } else if (compareToCurToken(
-                Identifier)) { // variable re-instantiation // x = 5; as opposed to the already declared NUM x = 4;
+        }
+            // variable re-instantiation // x = 5; as opposed to the already declared NUM x = 4;
+        else if (compareToCurToken(Identifier)) {
             match(Identifier);
             match(Eq);
 
             // check to see if the variable has already been declared (should be, else return parsing error)
             if (!isUsedIdentifier(curToken.getTokenText())) {
-                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable <%s> before assignment..line number: %d",
+                printf(ANSI_COLOR_CYAN "\nParsing error..referencing variable <%s> before assignment..line number: %d",
                        curToken.getTokenText().c_str(), lexer.getCurLineNumber());
                 exit(35);
             }
@@ -402,7 +410,8 @@ private:
                 //somehow need to check A) What type the variable is and B) if the literal matches that type
             }
         } else {
-            printf(ANSI_COLOR_CYAN "Parsing error..invalid statement on line: %d ...\n%s <-*", lexer.getCurLineNumber(),
+            printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s <-*",
+                   lexer.getCurLineNumber(),
                    lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());
             exit(36);
         }
