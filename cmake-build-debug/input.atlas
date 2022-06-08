@@ -1,3 +1,2 @@
-
-NUM x = 5;
-NUM x = 6;
+STRING name = "Anthony";
+STRING name = "Bob";

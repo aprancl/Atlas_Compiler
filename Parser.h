@@ -105,6 +105,10 @@ private:
 //    }
 
     // compare a given token to what the current token is
+    bool compareToLastToken(TokenType type) {
+        return (type == this->lastToken.getType());
+    }
+
     bool compareToCurToken(TokenType type) { //             used to check the first token of each statement
         return (type == this->curToken.getType());
     }
@@ -304,13 +308,19 @@ private:
             }
 
         } else if (compareToCurToken(StringKW)) { // variable assignment of type string
-            std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_STRING";
 
+            std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_STRING";
             advanceToken();
 
+            if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
+                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d",
+                       lexer.getCurLineNumber());
+                exit(35);
+            }
 
             match(Identifier);
             match(Eq);
+
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n";
                 advanceToken();
@@ -318,11 +328,11 @@ private:
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n";
                 advanceToken();
-
             } else {
                 printf(ANSI_COLOR_CYAN "Parsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
                 exit(35);
             }
+
 
             EOS();
 
