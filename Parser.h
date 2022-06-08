@@ -51,7 +51,6 @@ private:
         } else {
             for (std::string var: declared_vars) {
                 if (tokenText == var.substr(2)) {
-                    int x = 5;
                     return 1;
                 }
             }
@@ -62,30 +61,14 @@ private:
     }
 
 
-    void isValidIdentifier() {
-
-        if (compareToCurToken(
-                Identifier)) { // identifiers need to be handled such that duplicates are not allowed
-
-            if (!isUsedIdentifier(curToken.getTokenText())) {
-                printf(ANSI_COLOR_CYAN "Parsing error..referencing variable <%s> before assignment");
-            }
+    bool isVarType(Token variable, std::string dataType){
 
 
-            // this system removes duplicates, but which is good, but it doesn't belong here
-//            if (!isUsedIdentifier(curToken.getTokenText())) {
-//                declared_vars.push_back(curToken.getTokenText());
-//                advanceToken();
-//                skipWhiteSpaces();
-//            } else { // in the case that the variable has already been used
-//                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d\nexpected token(s) <%s> but got <%s>",
-//                       lexer.getCurLineNumber() + 2,// <-* ended here
-//                       Token::typeToString(type).c_str(),
-//                       Token::typeToString(this->curToken.getType()).c_str());
-//                exit(35);
-//            }
-        }
+
     }
+
+
+
 
     bool isComparisonOperator(Token token) {
         return (token.getType() == EqEq || token.getType() == NotEq || token.getType() == GtEq ||
