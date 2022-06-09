@@ -61,8 +61,22 @@ private:
     }
 
 
-    bool isVarType(Token variable, std::string dataType) {
+    TokenType getVarType(Token variable) {
 
+        if (variable.getType() == Identifier) {
+
+            for (std::string var: declared_vars) {
+
+                if (var.substr(2) == variable.getTokenText()) {
+                    return (var[0] == 'S') ? StringLiteral : NumKW;
+                }
+
+            }
+
+
+        } else {
+            // error of type referencing variable <var> before declaration
+        }
 
     }
 
@@ -77,12 +91,27 @@ private:
                 token.getType() == Fslash);
     }
 
-//    void skipWhiteSpaces() {
-//
-//        while (compareToCurToken(Space) || compareToCurToken(NewLine)) {
-//            advanceToken();
-//        }
-//    }
+    bool isVarFloat() {
+
+        int startPosition = lexer.getCurPosition();
+
+        while (lexer.getCurChar() != ";") {
+
+            if (lexer.getCurChar() == "f" && lexer.getPeek() == "l") {
+                lexer.setCurPostion(startPosition);
+                return 1;
+            }
+
+            lexer.nextChar();
+
+        }
+
+        lexer.setCurPostion(startPosition);
+        lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
+        return 0;
+
+
+    }
 
     // compare a given token to what the current token is
     bool compareToLastToken(TokenType type) {
@@ -117,21 +146,23 @@ private:
             printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s> ..line number: %d\n",
                    Token::typeToString(type).c_str(),
                    Token::typeToString(this->curToken.getType()).c_str(), lexer.getCurLineNumber());
-            exit(35); //  stop program && lexical analysis
+            exit(35); //  stop program && parsing
         } else if (compareToCurToken(Identifier)) {
 
-            // if we are declaring a variable, we want to document it // else just continue
-            if (lastToken.getType() == NumKW) {
-                std::string token_text = "N_" + curToken.getTokenText();
-                declared_vars.push_back(token_text);
-            } else if (lastToken.getType() == StringKW) {
-                std::string token_text = "S_" + curToken.getTokenText();
-                declared_vars.push_back(token_text);
+            // if we are declaring a variable, we want to document it and its data type
+            std::string token_text;
+            if (lastToken.getType() == StringKW) {
+                token_text = "S_" + curToken.getTokenText();
+            } else if (lastToken.getType() == NumKW) {
+                if (isVarFloat()) {
+                    token_text = "F_" + curToken.getTokenText();
+                } else {
+                    token_text = "N_" + curToken.getTokenText();
+                }
             }
-            advanceToken();
-        } else {
-            advanceToken();
+            declared_vars.push_back(token_text);
         }
+        advanceToken();
     }
 
 
@@ -329,6 +360,7 @@ private:
                 exit(35);
             }
 
+            int x = 5;
             match(Identifier);
             match(Eq);
             expression();
@@ -400,8 +432,7 @@ private:
         }
             // variable re-instantiation // x = 5; as opposed to the already declared NUM x = 4;
         else if (compareToCurToken(Identifier)) {
-            match(Identifier);
-            match(Eq);
+            std::cout << "(STATEMENT)-VARIABLE_RE-INSTANTIATION\n";
 
             // check to see if the variable has already been declared (should be, else return parsing error)
             if (!isUsedIdentifier(curToken.getTokenText())) {
@@ -409,6 +440,11 @@ private:
                        curToken.getTokenText().c_str(), lexer.getCurLineNumber());
                 exit(35);
             }
+
+            match(Identifier);
+            match(Eq);
+
+
             TokenType type = curToken.getType();
 
             // thinking about it, this will not work, and will probably need to be changed on account that it allows any data type to be assigned to any variable

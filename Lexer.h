@@ -436,6 +436,9 @@ public:
     std::string getCurChar() {
         return curChar;
     }
+    void setCurChar(std::string character){
+        this->curChar = character;
+    }
 
     std::string getLastChar() {
         return lastChar;
@@ -445,12 +448,19 @@ public:
         return curPosition;
     }
 
+    void setCurPostion(int position){
+        this->curPosition = position;
+    }
+
     std::string getSource() {
         return source;
     }
 
     int getCurLineNumber() {
         return curLineNum;
+    }
+    std::string getPeek(){
+        return lookAhead();
     }
 
 };
