@@ -160,7 +160,7 @@ private:
                     token_text = "N_" + curToken.getTokenText();
                 }
             }
-            declared_vars.push_back(token_text);
+            declared_vars.push_back(token_text); // the variables are finally document
         }
         advanceToken();
     }
