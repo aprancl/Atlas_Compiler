@@ -9,21 +9,21 @@ WRITE "Hello, world!";
 
 CC probably "hardest" statement to parse
 NUM foo = bar * 3 + 2;
-NUM x = 1;
+NUM a = 1;
 
-IF [x != 1]{
-    STRING name = "Erick";
+IF [p != 1]{
+    STRING names = "Erick";
     WRITE "Hola amigo!";
-    NUN age = 9 * 2 + 1;
+    NUM age = 9 * 2 + 1;
 };
 
-WHILE [x == 1]{
+WHILE [q == 1]{
     WRITE "Hello world";
 };
 
-IF [x != 1]{
-    STRING name = "Erick";
-    NUM age = 9 * 2 + 1;
+IF [r != 1]{
+    STRING namess = "Erick";
+    NUM ages = 9 * 2 + 1;
     IF [ 1 == 1 ]{
         WRITE "I hope this parses!";
         FOR [10] {

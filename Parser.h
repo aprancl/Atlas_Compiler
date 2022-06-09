@@ -61,13 +61,10 @@ private:
     }
 
 
-    bool isVarType(Token variable, std::string dataType){
-
+    bool isVarType(Token variable, std::string dataType) {
 
 
     }
-
-
 
 
     bool isComparisonOperator(Token token) {
@@ -296,8 +293,9 @@ private:
             advanceToken();
 
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
-                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d",
-                       lexer.getCurLineNumber());
+                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable <%s>..line number: %d",
+                       curToken.getTokenText().c_str(),
+                       lexer.getCurLineNumber() + 4);
                 exit(35);
             }
 
@@ -325,8 +323,9 @@ private:
             advanceToken();
 
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
-                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable..line number: %d",
-                       lexer.getCurLineNumber());
+                printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable <%s>..line number: %d",
+                       curToken.getTokenText().c_str(),
+                       lexer.getCurLineNumber() + 4);
                 exit(35);
             }
 
