@@ -295,7 +295,7 @@ private:
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
                 printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable <%s>..line number: %d",
                        curToken.getTokenText().c_str(),
-                       lexer.getCurLineNumber() + 4);
+                       lexer.getCurLineNumber());
                 exit(35);
             }
 
@@ -325,7 +325,7 @@ private:
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
                 printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable <%s>..line number: %d",
                        curToken.getTokenText().c_str(),
-                       lexer.getCurLineNumber() + 4);
+                       lexer.getCurLineNumber());
                 exit(35);
             }
 

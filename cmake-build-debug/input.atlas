@@ -1,33 +1,3 @@
-CC PQR
-NUM x = 5;
-CC XYZ
-CC ABCs
 STRING name = "Anthony";
+STRING name = "Bob";
 
-STRING msg = "Anthony";
-WRITE "Hello, world!";
-
-CC probably "hardest" statement to parse
-NUM foo = bar * 3 + 2;
-NUM a = 1;
-
-IF [p != 1]{
-    STRING names = "Erick";
-    WRITE "Hola amigo!";
-    NUM age = 9 * 2 + 1;
-};
-
-WHILE [q == 1]{
-    WRITE "Hello world";
-};
-
-IF [r != 1]{
-    STRING namess = "Erick";
-    NUM ages = 9 * 2 + 1;
-    IF [ 1 == 1 ]{
-        WRITE "I hope this parses!";
-        FOR [10] {
-            WRITE "Hello";
-        };
-    };
-};
