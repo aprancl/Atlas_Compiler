@@ -85,7 +85,7 @@ public:
         this->type = type;
     }
 
-    // getters/accessors (don't need setters)
+    // getters/accessors
     std::string getTokenText() {
         return tokenText;
     }
