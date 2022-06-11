@@ -65,10 +65,10 @@ private:
 
         if (variable.getType() == Identifier) {
 
-            for (std::string var: declared_vars) {
+            for (std::string dec_var : declared_vars) {
 
-                if (var.substr(2) == variable.getTokenText()) {
-                    return (var[0] == 'S') ? StringLiteral : NumKW;
+                if (dec_var.substr(2) == variable.getTokenText()) {
+                    return (dec_var[0] == 'S') ? StringLiteral : NumKW;
                 }
 
             }
@@ -159,10 +159,10 @@ private:
                 if (isVarFloat()) {
                     token_text = "F_" + curToken.getTokenText();
                 } else {
-                    token_text = "N_" + curToken.getTokenText();
+                    token_text = "I_" + curToken.getTokenText();
                 }
             }
-            declared_vars.push_back(token_text); // the variables are finally document
+            declared_vars.push_back(token_text); // the variable is finally documented
         }
         advanceToken();
     }
@@ -215,7 +215,16 @@ private:
             advanceToken();
 
         } else if (compareToCurToken(Identifier)) {
-            advanceToken();
+
+            if (isUsedIdentifier(curToken.getTokenText())) {
+                advanceToken();
+            } else {
+                // want to come back to this
+                printf(ANSI_COLOR_CYAN "\nParsing error..referencing undeclared variable <%s> before assignment..line number: %d\n",
+                       curToken.getTokenText().c_str(), lexer.getCurLineNumber());
+                exit(35);
+            }
+
 
         } else {
 
@@ -343,7 +352,7 @@ private:
                 std::cout << "..VARIABLE\n";
                 advanceToken();
             } else {
-                printf(ANSI_COLOR_CYAN "Parsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
+                printf(ANSI_COLOR_CYAN "\nParsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
                 exit(35);
             }
 
@@ -442,12 +451,16 @@ private:
                        curToken.getTokenText().c_str(), lexer.getCurLineNumber());
                 exit(35);
             }
+            // get variable type
 
-            match(Identifier);
-            match(Eq);
+            match(Identifier); // advance
+            match(Eq); // advance
 
-
+            // get literal type
             TokenType type = curToken.getType();
+
+
+            // .... if they match allow, else do not
 
             // thinking about it, this will not work, and will probably need to be changed on account that it allows any data type to be assigned to any variable
             if (curToken.getType() == StringLiteral || curToken.getType() == IntLiteral ||
@@ -480,6 +493,7 @@ public:
         while (!(compareToCurToken(Eof))) {
             statement();
         }
+        int x = 4; // debug marker
         std::cout << "🌐 parsing complete\n";
     }
 

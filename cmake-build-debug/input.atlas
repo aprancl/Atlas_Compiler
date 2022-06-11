@@ -1,1 +1,3 @@
-NUM x = fl6.0;
+NUM x = 3;
+
+x = "Anthony";
