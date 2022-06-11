@@ -43,60 +43,13 @@ private:
 
     // helper methods
 
-    // this is such a horrible fix, but it is temporary!!
-    // instead of dealing with referencing issue between classes I have just copied the method
-    static std::string typeToString(int tokenType) {
-        std::map<int, std::string> typeMap;
-        typeMap[-2] = "None";
-        typeMap[-1] = "Eof";
-        typeMap[0] = "NewLine";
-        typeMap[1] = "Space";
-        typeMap[2] = "IntLiteral";
-        typeMap[3] = "StringLiteral";
-        typeMap[4] = "Identifier";
-        typeMap[5] = "Eos";
-        typeMap[6] = "Comment";
-        typeMap[7] = "FloatLiteral";
-        typeMap[201] = "ParenthR";
-        typeMap[200] = "ParenthL";
-        typeMap[301] = "ClrbraceR";
-        typeMap[300] = "CrlbraceL";
-        typeMap[401] = "SqrbraceR";
-        typeMap[400] = "SqrbraceL";
-        typeMap[10] = "Eq";
-        typeMap[11] = "Plus";
-        typeMap[12] = "Minus";
-        typeMap[13] = "Asterisk";
-        typeMap[14] = "Fslash";
-        typeMap[15] = "Gt";
-        typeMap[16] = "Lt";
-        typeMap[17] = "EqEq";
-        typeMap[18] = "NotEq";
-        typeMap[19] = "GtEq";
-        typeMap[20] = "LtEq";
-        typeMap[25] = "IntKW";
-        typeMap[50] = "FloKW";
-        typeMap[75] = "StringKW";
-        typeMap[99] = "Keyword";
-        typeMap[199] = "Bslash";
-        typeMap[100] = "Write";
-        typeMap[101] = "If";
-        typeMap[102] = "Input";
-        typeMap[103] = "Cc";
-        typeMap[104] = "While";
-        typeMap[105] = "For";
-
-        return typeMap[tokenType];
-    }
-
-
     bool isUsedIdentifier(std::string tokenText) {
         if (this->declared_vars.size() == 0) {
             return 0;
 
         } else {
             for (std::string var: declared_vars) {
-                if (tokenText == var.substr(2)) {
+                if (var.substr(2) == tokenText) {
                     return 1;
                 }
             }
@@ -504,7 +457,17 @@ private:
 
             TokenType variableType = getVarType(curToken);
 
-            match(Identifier); // advance
+//            match(Identifier); // advance
+
+            if (compareToCurToken(Identifier)) {
+                advanceToken();
+            } else {
+                printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
+                       lexer.getCurLineNumber(),
+                       lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());
+                exit(36);
+            }
+
             match(Eq); // advance
 
             // get literal type
@@ -521,7 +484,7 @@ private:
 
             } else {
                 printf(ANSI_COLOR_CYAN "Parsing error..variable type <%s> and literal type <%s> do not match",
-                       typeToString(variableType).c_str(), typeToString(literalType).c_str());
+                       Token::typeToString(variableType).c_str(), Token::typeToString(literalType).c_str());
                 exit(35);
             }
 
