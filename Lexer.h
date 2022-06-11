@@ -365,8 +365,7 @@ public:
             if (decimal_counter > 1) {
                 printf(ANSI_COLOR_MAGENTA "\nLexing error..cannot use more than one decimal per float literal.. <%s> ..line number: %d\n",
                        float_literal.c_str(), curLineNum);
-            }
-            else {
+            } else {
                 token = new Token(float_literal, FloatLiteral);
             }
 
@@ -436,7 +435,8 @@ public:
     std::string getCurChar() {
         return curChar;
     }
-    void setCurChar(std::string character){
+
+    void setCurChar(std::string character) {
         this->curChar = character;
     }
 
@@ -448,7 +448,7 @@ public:
         return curPosition;
     }
 
-    void setCurPostion(int position){
+    void setCurPostion(int position) {
         this->curPosition = position;
     }
 
@@ -459,11 +459,14 @@ public:
     int getCurLineNumber() {
         return curLineNum;
     }
-    std::string getPeek(){
+
+    std::string getPeek() {
         return lookAhead();
     }
 
 };
+
+
 
 
 #endif //ATLAS_COMPILER_LEXER_H
