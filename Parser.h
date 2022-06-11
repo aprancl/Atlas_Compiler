@@ -99,6 +99,7 @@ private:
 
             if (lexer.getCurChar() == "f" && lexer.getPeek() == "l") {
                 lexer.setCurPostion(startPosition);
+                lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
                 return 1;
             }
 
@@ -139,6 +140,7 @@ private:
             nToken = lexer.getToken();
         }
         nextToken = nToken;
+        int x = 4;
     }
 
     void match(TokenType type) {//                      used to check tokens within a statement
@@ -457,7 +459,7 @@ private:
                 //somehow need to check A) What type the variable is and B) if the literal matches that type
             }
         } else {
-            printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s <-*",
+            printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
                    lexer.getCurLineNumber(),
                    lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());
             exit(36);

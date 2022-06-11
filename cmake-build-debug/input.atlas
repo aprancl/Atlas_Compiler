@@ -1,13 +1,1 @@
-
-
-FOR[10] {
-    WRITE "Hello world";
-};
-
-IF [10 > 9] {
-    NUM x = 5;
-    STRING p = "Anthony";
-};
-
-NUM z = fl6.0;
-
+NUM x = fl6.0;
