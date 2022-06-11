@@ -512,8 +512,15 @@ private:
 
 
             if (variableType == literalType) {
-                match(literalType);
-                EOS();
+                if (!(literalType == StringLiteral)){
+                    expression();
+                    EOS();
+                } else if (literalType == StringLiteral){
+                    match(literalType);
+                    EOS();
+                }
+//                match(literalType);
+//                EOS();
             } else {
                 printf(ANSI_COLOR_CYAN "Parsing error..variable type <%s> and literal type <%s> do not match",
                        typeToString(variableType).c_str(), typeToString(literalType).c_str());

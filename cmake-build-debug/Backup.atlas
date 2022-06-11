@@ -31,3 +31,12 @@ IF [r != 1]{
         };
     };
 };
+
+
+
+
+CC this wont compile
+
+NUM x = 3;
+x = 4;
+NUM z = fl5.0;
