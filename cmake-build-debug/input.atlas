@@ -1,8 +1,15 @@
-STRING name = "Anthony";
-name = "Bob";
+WRITE "How many fibonacci numbers do you want?";
+INPUT nums;
+WRITE " ";
 
-NUM x = 4;
-x = 2;
+NUM a = 0;
+NUM b = 1;
+NUM c = 0;
 
-NUM pi = fl3.14;
-pi = fl4.5;
+WHILE [nums > 0]{
+    WRITE a;
+    c = a + b
+    a = b;
+    b = c;
+    nums = nums - 1;
+};

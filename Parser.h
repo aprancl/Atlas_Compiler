@@ -474,7 +474,7 @@ private:
             TokenType literalType = curToken.getType();
 
 
-            if (variableType == literalType) {
+            if (variableType == literalType || literalType == Identifier) {
                 if (!(literalType == StringLiteral)) {
                     expression();
                 } else if (literalType == StringLiteral) {
