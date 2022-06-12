@@ -437,8 +437,16 @@ private:
             EOCB();
 
         } else if (compareToCurToken(Input)) { // input statements
-            std::cout << "(STATEMENT)-INPUT\n";
+            std::cout << "(STATEMENT)-INPUT";
             advanceToken();
+
+            Token dataCategory = curToken;
+            advanceToken();
+            if (dataCategory.getType() == StringKW){
+                std::cout << "..STRING\n";
+            } else if (dataCategory.getType() == NumKW){
+                std::cout << "..NUM\n";
+            }
 
             match(Identifier);
             EOS();

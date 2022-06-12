@@ -1,5 +1,5 @@
 WRITE "How many fibonacci numbers do you want?";
-INPUT nums;
+INPUT NUM nums;
 WRITE " ";
 
 NUM a = 0;
