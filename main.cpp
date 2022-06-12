@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Lexer.h"
 #include "Parser.h"
+#include "Emitter.h"
 #include <map>
 #include <fstream>
 
@@ -22,7 +23,7 @@ std::string getSource(std::string fileName) {
         return source;
 
     } else {
-        return "Input file not found\n";
+        return ANSI_COLOR_RED "Error: Input file not found\n";
     }
 
 }
@@ -40,9 +41,11 @@ int main() {
     // create necessary object
     Lexer lexer(input);
     Parser parser(lexer);
+    // emitter = Emitter("out.c");
 
     // start the program
     parser.program();
+    // emitter.writeFile();
 
     return 0;
 }
