@@ -6,6 +6,7 @@
 #define ATLAS_COMPILER_PARSER_H
 
 #include "Lexer.h"
+#include "Emitter.h"
 #include <stdio.h>
 #include <vector>
 
@@ -18,6 +19,7 @@ class Parser {
 
 
     Lexer lexer;
+    Emitter emitter;
     Token lastToken;
     Token curToken;
     Token nextToken;
@@ -28,8 +30,9 @@ public:
 
     Parser() = default;
 
-    Parser(Lexer lexer) {
+    Parser(Lexer lexer, Emitter emitter) {
         this->lexer = lexer;
+        this->emitter = emitter;
         lastToken = Token("", None);
         curToken = Token("", None);
         nextToken = Token("", None);

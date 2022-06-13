@@ -40,8 +40,9 @@ int main() {
 
     // create necessary object
     Lexer lexer(input);
-    Parser parser(lexer);
-    // emitter = Emitter("out.c");
+    Emitter emitter("/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug");
+    Parser parser(lexer, emitter);
+
 
     // start the program
     parser.program();
