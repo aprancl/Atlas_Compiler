@@ -499,18 +499,6 @@ private:
                 exit(35);
             }
 
-
-//            // .... if they match allow, else do not
-//
-//            // thinking about it, this will not work, and will probably need to be changed on account that it allows any data type to be assigned to any variable
-//            if (curToken.getType() == StringLiteral || curToken.getType() == IntLiteral ||
-//                curToken.getType() == FloatLiteral) {
-//                match(literalType);
-//                EOS();
-//            } else {
-//                //This should be a parsing error about assigning string to int or int to string
-//                //somehow need to check A) What type the variable is and B) if the literal matches that type
-//            }
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
                    lexer.getCurLineNumber(),
@@ -525,15 +513,20 @@ public:
 
 // program ::= {statement}
     void program() {
+        emitter.emitLine("#include <stdio.h>");
+        emitter.emitLine("int main(){");
+
+
         std::cout << "PROGRAM\n";
-
-
 
         // parse through all given statements
         while (!(compareToCurToken(Eof))) {
             statement();
         }
-        int x = 4; // debug marker
+
+        emitter.emitLine("return 0;");
+        emitter.emitLine("}");
+        emitter.writeFile();
         std::cout << "🌐 parsing complete\n";
     }
 
