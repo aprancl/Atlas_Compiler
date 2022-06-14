@@ -20,6 +20,7 @@ class Parser {
 
     Lexer lexer;
     Emitter emitter;
+    Token farBackToken;
     Token lastToken;
     Token curToken;
     Token nextToken;
@@ -33,6 +34,7 @@ public:
     Parser(Lexer lexer, Emitter emitter) {
         this->lexer = lexer;
         this->emitter = emitter;
+        farBackToken = Token("", None);
         lastToken = Token("", None);
         curToken = Token("", None);
         nextToken = Token("", None);
@@ -135,6 +137,7 @@ private:
 
     void advanceToken() {
 
+        farBackToken = lastToken;
         lastToken = curToken;
         curToken = nextToken;
 
@@ -160,9 +163,9 @@ private:
             std::string token_text;
             if (lastToken.getType() == StringKW) {
                 token_text = "S_" + curToken.getTokenText();
-                emitter.emitHeader("String ");
+                emitter.emitHeader("String "); // there is no string keyword in c! whoops...
             } else if (lastToken.getType() == NumKW) {
-                if (isVarFloat()) {
+                if (isVarFloat() || farBackToken.getType() == Input) {
                     token_text = "F_" + curToken.getTokenText();
                     emitter.emitHeader("float ");
                 } else {
@@ -222,12 +225,14 @@ private:
                curToken.getTokenText().c_str());
 
         if (compareToCurToken(IntLiteral) || compareToCurToken(FloatLiteral)) {
+            emitter.emit(curToken.getTokenText());
             advanceToken();
             return;
 
         } else if (compareToCurToken(Identifier)) {
 
             if (isUsedIdentifier(curToken.getTokenText())) {
+                emitter.emit(curToken.getTokenText());
                 advanceToken();
                 return;
             } else {
@@ -259,13 +264,7 @@ private:
         std::cout << "UNARY\n";
 
         if (compareToCurToken(Plus) || compareToCurToken(Minus)) {
-
-            if (compareToCurToken(Plus)) {
-                emitter.emit(" + ");
-            } else if (compareToCurToken(Minus)) {
-                emitter.emit(" - ");
-            }
-
+            emitter.emit(" " + curToken.getTokenText() + " ");
             advanceToken();
         }
         primary();
@@ -277,6 +276,7 @@ private:
 
         // there can be 0 or more mult OR div sub expressions
         while (compareToCurToken(Asterisk) || compareToCurToken(Fslash)) {
+            emitter.emit(" " + curToken.getTokenText() + " ");
             advanceToken();
             unary();
         }
@@ -291,6 +291,7 @@ private:
 
         // there are 0 or more + OR - expression
         while (compareToCurToken(Plus) || compareToCurToken(Minus)) {
+            emitter.emit(" " + curToken.getTokenText() + " ");
             advanceToken();
             term();
         }
@@ -303,6 +304,7 @@ private:
         expression();
 
         if (isComparisonOperator(curToken)) {
+            emitter.emit(" " + curToken.getTokenText() + " ");
             advanceToken();
             expression();
         } else {
@@ -311,6 +313,7 @@ private:
         }
 
         while (isComparisonOperator(curToken)) {
+            emitter.emit(curToken.getTokenText());
             advanceToken();
             expression();
         }
@@ -387,11 +390,14 @@ private:
                 exit(35);
             }
 
-            int x = 5;
             match(Identifier);
+            emitter.emit(lastToken.getTokenText() + " ");
             match(Eq);
+            emitter.emit(lastToken.getTokenText() + " ");
             expression();
             EOS();
+            emitter.emit(lastToken.getTokenText() + "\n");
+
 
         } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";
@@ -414,7 +420,7 @@ private:
                 statement();
             }
             EOCB();
-            emitter.emit("}\n");
+            emitter.emit("\n}\n");
 
         } else if (compareToCurToken(While)) { // while loops
             std::cout << "(STATEMENT)-WHILE_LOOP\n";
@@ -430,7 +436,7 @@ private:
             while (!compareToCurToken(CrlbraceR)) {
                 statement();
             }
-            emitter.emit("}\n");
+            emitter.emit("\n}\n");
             EOCB();
 
         } else if (compareToCurToken(For)) { // for loops
@@ -460,18 +466,28 @@ private:
 
         } else if (compareToCurToken(Input)) { // input statements
             std::cout << "(STATEMENT)-INPUT";
+            std::string outSource;
+
+            outSource.append("scanf(");
             advanceToken();
 
-            Token dataCategory = curToken;
-            advanceToken();
-            if (dataCategory.getType() == StringKW) {
+            std::string inputType;
+            if (curToken.getType() == StringKW) {
                 std::cout << "..STRING\n";
-            } else if (dataCategory.getType() == NumKW) {
-                std::cout << "..NUM\n";
+                inputType = "s";
+            } else if (curToken.getType()  == NumKW) {
+                std::cout << "..NUM";
+                inputType = "f";
             }
+            advanceToken();
+            outSource.append("\"%" + inputType + "\",");
 
             match(Identifier);
+            outSource.append("&" + lastToken.getTokenText() + ")");
+            outSource.append(curToken.getTokenText() + "\n");
             EOS();
+            emitter.emit(outSource);
+
         }
             // variable re-instantiation // x = 5; as opposed to the already declared NUM x = 4;
         else if (compareToCurToken(Identifier)) {
@@ -483,13 +499,14 @@ private:
                        curToken.getTokenText().c_str(), lexer.getCurLineNumber());
                 exit(35);
             }
-            // get variable type
 
+            // get variable type
             TokenType variableType = getVarType(curToken);
 
 //            match(Identifier); // advance
 
             if (compareToCurToken(Identifier)) {
+                emitter.emit(curToken.getTokenText());
                 advanceToken();
             } else {
                 printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
@@ -499,6 +516,7 @@ private:
             }
 
             match(Eq); // advance
+            emitter.emit(" " + lastToken.getTokenText() + " ");
 
             // get literal type
             TokenType literalType = curToken.getType();
@@ -510,7 +528,9 @@ private:
                 } else if (literalType == StringLiteral) {
                     match(literalType);
                 }
+                emitter.emit(curToken.getTokenText() + "\n");
                 EOS();
+
 
             } else {
                 printf(ANSI_COLOR_CYAN "Parsing error..variable type <%s> and literal type <%s> do not match",
