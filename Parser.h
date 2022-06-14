@@ -552,9 +552,6 @@ public:
 
 // program ::= {statement}
     void program() {
-//        emitter.emitLine("#include <stdio.h>");
-//        emitter.emitLine("int main(){");
-
 
         std::cout << "PROGRAM\n";
 
