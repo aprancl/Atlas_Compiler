@@ -366,6 +366,7 @@ public:
                 printf(ANSI_COLOR_MAGENTA "\nLexing error..cannot use more than one decimal per float literal.. <%s> ..line number: %d\n",
                        float_literal.c_str(), curLineNum);
             } else {
+                curPosition--;
                 token = new Token(float_literal, FloatLiteral);
             }
 

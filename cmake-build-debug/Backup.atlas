@@ -35,8 +35,21 @@ IF [r != 1]{
 
 
 
-CC this wont compile
+CC Fibonacci
 
-NUM x = 3;
-x = 4;
-NUM z = fl5.0;
+WRITE "How man fibonacci numbers do you want?";
+INPUT NUM nums;
+WRITE " ";
+
+NUM a = 0;
+NUM b = 1;
+NUM c = 0;
+
+WHILE [nums > 0] {
+
+    WRITE a;
+    c = a + b;
+    a = b;
+    b = c;
+    nums = nums - 1;
+};

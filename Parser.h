@@ -397,7 +397,7 @@ private:
             expression();
             EOS();
             emitter.emit(lastToken.getTokenText() + "\n");
-
+            int x = 4;
 
         } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";
@@ -475,7 +475,7 @@ private:
             if (curToken.getType() == StringKW) {
                 std::cout << "..STRING\n";
                 inputType = "s";
-            } else if (curToken.getType()  == NumKW) {
+            } else if (curToken.getType() == NumKW) {
                 std::cout << "..NUM";
                 inputType = "f";
             }
