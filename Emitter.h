@@ -17,6 +17,7 @@ class Emitter {
     std::string fullPath;
     std::string header;
     std::string outSource;
+    std::string setUp = "#include <stdio.h>\nint main() {\n";
 
 public:
 
@@ -24,8 +25,8 @@ public:
 
     Emitter(std::string fullPath) {
         this->fullPath = fullPath;
-        header = " ";
-        outSource = " ";
+        header = "";
+        outSource = "";
     }
 
     void emit(std::string outSource) {
@@ -36,8 +37,11 @@ public:
         this->outSource += outSource + "\n";
     }
 
-    void headerLine(std::string outSource) {
+    void emitHeaderLine(std::string outSource) {
         this->header += outSource + "\n";
+    }
+    void emitHeader(std::string outSource) {
+        this->header += outSource;
     }
 
     void writeFile() {
@@ -45,7 +49,7 @@ public:
         myOutFile.open(fullPath);
 
         if (myOutFile.is_open()) {
-            myOutFile << header + outSource;
+            myOutFile << setUp + "\n" + header + "\n" + outSource;
             myOutFile.close();
         } else {
             printf(ANSI_COLOR_YELLOW "\nEmitting error..could not open file path...\n%s\n...for writing\n", fullPath.c_str());

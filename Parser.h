@@ -100,7 +100,7 @@ private:
 
         int startPosition = lexer.getCurPosition();
 
-        while (lexer.getCurChar() != ";") {
+        while (lexer.getCurChar() != ";" && lexer.getCurChar() != "\0") {
 
             if (lexer.getCurChar() == "f" && lexer.getPeek() == "l") {
                 lexer.setCurPostion(startPosition);
@@ -160,14 +160,19 @@ private:
             std::string token_text;
             if (lastToken.getType() == StringKW) {
                 token_text = "S_" + curToken.getTokenText();
+                emitter.emitHeader("String ");
             } else if (lastToken.getType() == NumKW) {
                 if (isVarFloat()) {
                     token_text = "F_" + curToken.getTokenText();
+                    emitter.emitHeader("float ");
                 } else {
                     token_text = "I_" + curToken.getTokenText();
+                    emitter.emitHeader("int ");
                 }
             }
+            emitter.emitHeaderLine(token_text.substr(2) + ";");
             declared_vars.push_back(token_text); // the variable is finally documented
+
         }
         advanceToken();
     }
@@ -218,11 +223,13 @@ private:
 
         if (compareToCurToken(IntLiteral) || compareToCurToken(FloatLiteral)) {
             advanceToken();
+            return;
 
         } else if (compareToCurToken(Identifier)) {
 
             if (isUsedIdentifier(curToken.getTokenText())) {
                 advanceToken();
+                return;
             } else {
                 // want to come back to this
                 printf(ANSI_COLOR_CYAN "\nParsing error..referencing undeclared variable <%s> before assignment..line number: %d\n",
@@ -252,6 +259,13 @@ private:
         std::cout << "UNARY\n";
 
         if (compareToCurToken(Plus) || compareToCurToken(Minus)) {
+
+            if (compareToCurToken(Plus)) {
+                emitter.emit(" + ");
+            } else if (compareToCurToken(Minus)) {
+                emitter.emit(" - ");
+            }
+
             advanceToken();
         }
         primary();
@@ -310,22 +324,19 @@ private:
             std::cout << "(STATEMENT)-WRITE\n";
             advanceToken(); // the next token is a space, and it gets stuck
 
-
-            // skip extra white space
-
-
             // search for string literal, identifier, or  expression
             if (compareToCurToken(StringLiteral)) {
+                emitter.emitLine((std::string) ("printf(\"") + curToken.getTokenText() + "\\n\");");
                 advanceToken();
-            } else if (compareToCurToken(Identifier)) {
-                advanceToken();
+            } else if (compareToCurToken(Identifier) || compareToCurToken(IntLiteral) ||
+                       compareToCurToken(FloatLiteral)) {
+                emitter.emit((std::string) ("printf(\"%") + ".2f\\n\", (float)(");
+                expression();
+                emitter.emitLine("));");
             } else {
-                expression(); // if we didn't find a string, we will want to print this expression
+                printf(ANSI_COLOR_CYAN "\nParsing error..only literals of type <STRING, INT, FLOAT> will print\n");
+                exit(35);
             }
-
-
-            // check for the final EOS statement
-            //match(Eos);
 
             if (compareToCurToken(Eos)) {
                 EOS();
@@ -389,31 +400,39 @@ private:
 
         } else if (compareToCurToken(If)) { // if statements
             std::cout << "(STATEMENT)-IF_CONDITION\n";
+            emitter.emit("if (");
             advanceToken();
 
             match(SqrbraceL);
             comparison();
             match(SqrbraceR);
             match(CrlbraceL);
+            emitter.emit(") {\n");
+
             // execute all statements in the code block
             while (!compareToCurToken(CrlbraceR)) { // this kind of hurts my brain, but it works
                 statement();
             }
             EOCB();
+            emitter.emit("}\n");
 
         } else if (compareToCurToken(While)) { // while loops
             std::cout << "(STATEMENT)-WHILE_LOOP\n";
+            emitter.emit("while (");
             advanceToken();
 
             match(SqrbraceL);
             comparison();
             match(SqrbraceR);
             match(CrlbraceL);
+            emitter.emit(") {\n");
             // execute all statements in the code block
             while (!compareToCurToken(CrlbraceR)) {
                 statement();
             }
+            emitter.emit("}\n");
             EOCB();
+
         } else if (compareToCurToken(For)) { // for loops
             std::cout << "(STATEMENT)-FOR_LOOP";
 
@@ -445,9 +464,9 @@ private:
 
             Token dataCategory = curToken;
             advanceToken();
-            if (dataCategory.getType() == StringKW){
+            if (dataCategory.getType() == StringKW) {
                 std::cout << "..STRING\n";
-            } else if (dataCategory.getType() == NumKW){
+            } else if (dataCategory.getType() == NumKW) {
                 std::cout << "..NUM\n";
             }
 
@@ -513,8 +532,8 @@ public:
 
 // program ::= {statement}
     void program() {
-        emitter.emitLine("#include <stdio.h>");
-        emitter.emitLine("int main(){");
+//        emitter.emitLine("#include <stdio.h>");
+//        emitter.emitLine("int main(){");
 
 
         std::cout << "PROGRAM\n";
