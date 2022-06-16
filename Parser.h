@@ -339,6 +339,7 @@ private:
                 advanceToken();
             } else if (compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
                 emitter.emitLine((std::string) ("printf(\"%s\\n\",") + curToken.getTokenText() + ");");
+                advanceToken();
             } else if (compareToCurToken(Identifier) || compareToCurToken(IntLiteral) ||
                        compareToCurToken(FloatLiteral)) {
                 emitter.emit((std::string) ("printf(\"%") + ".2f\\n\", (float)(");
@@ -349,7 +350,7 @@ private:
                 exit(35);
             }
 
-            advanceToken();
+
             EOS();
 
 

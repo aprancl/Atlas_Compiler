@@ -1,4 +1,10 @@
 CC troubleshooting
 
+NUM x = 5;
+WRITE x;
+
+NUM pi = fl3.14;
+WRITE pi;
+
 STRING name = "Anthony";
 WRITE name;
