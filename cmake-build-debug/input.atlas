@@ -1,10 +1,6 @@
 CC troubleshooting
 
-NUM x = 5;
-WRITE x;
+FOR [10] {
+    WRITE "Hello world";
+};
 
-NUM pi = fl3.14;
-WRITE pi;
-
-STRING name = "Anthony";
-WRITE name;

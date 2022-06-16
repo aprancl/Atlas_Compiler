@@ -25,6 +25,8 @@ class Parser {
     Token curToken;
     Token nextToken;
     std::vector<std::string> declared_vars;
+    std::vector<std::vector<std::string>> varDict;
+    int varDict_ptr;
 
 public:
     // constructors
@@ -32,6 +34,7 @@ public:
     Parser() = default;
 
     Parser(Lexer lexer, Emitter emitter) {
+        varDict_ptr = 0;
         this->lexer = lexer;
         this->emitter = emitter;
         farBackToken = Token("", None);
@@ -151,6 +154,35 @@ private:
         int x = 4;
     }
 
+    void docVar(Token variable) {
+
+        std::string varText;
+
+        if (lastToken.getType() == StringKW) {
+            varText = "S_" + curToken.getTokenText();
+
+        } else if (lastToken.getType() == NumKW) {
+            if (isVarFloat() || farBackToken.getType() == Input) {
+                varText = "F_" + curToken.getTokenText();
+                emitter.emitHeader("float ");
+            } else {
+                varText = "I_" + curToken.getTokenText();
+                emitter.emitHeader("int ");
+            }
+            emitter.emitHeaderLine(varText.substr(2) + ";");
+
+        }
+
+        varDict[varDict_ptr][0] = varText;
+
+
+    }
+
+
+    void docVal(Token value) {
+        varDict[varDict_ptr][0] = value.getTokenText();
+    }
+
     void match(TokenType type) {//                      used to check tokens within a statement
         if (!(compareToCurToken(type))) {
             printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s> ..line number: %d\n",
@@ -181,12 +213,12 @@ private:
     }
 
 
-    // the following is a series of functions that represent the various levels of abstraction in this programming language's grammar
-    // ie. a program consists of statements and statement consists of a combination of keywords and symbols etc...
-    // for more details, see README
+// the following is a series of functions that represent the various levels of abstraction in this programming language's grammar
+// ie. a program consists of statements and statement consists of a combination of keywords and symbols etc...
+// for more details, see README
 
 
-    // End Of Code Block
+// End Of Code Block
     void EOCB() {
 
 
@@ -204,7 +236,7 @@ private:
 
     }
 
-    // End Of Statement
+// End Of Statement
     void EOS() {
 
         if (!(compareToCurToken(Eos))) {
@@ -222,7 +254,7 @@ private:
     }
 
 
-    // parsing through expressions
+// parsing through expressions
 
     void primary() {
 
@@ -325,7 +357,7 @@ private:
         }
     }
 
-    // statement ::= "WRITE" (expression || TK.StringLiteral) TK.Eos || etc...
+// statement ::= "WRITE" (expression || TK.StringLiteral) TK.Eos || etc...
     void statement() { // this is the meat of the parser
 
         // for print (STATEMENT)
@@ -431,7 +463,7 @@ private:
             comparison();
             match(SqrbraceR);
             match(CrlbraceL);
-            emitter.emit(") {\n");
+            emitter.emit(")\n{\n");
 
             // execute all statements in the code block
             while (!compareToCurToken(CrlbraceR)) { // this kind of hurts my brain, but it works
@@ -449,7 +481,7 @@ private:
             comparison();
             match(SqrbraceR);
             match(CrlbraceL);
-            emitter.emit(") {\n");
+            emitter.emit(")\n{\n");
             // execute all statements in the code block
             while (!compareToCurToken(CrlbraceR)) {
                 statement();
@@ -458,18 +490,31 @@ private:
             EOCB();
 
         } else if (compareToCurToken(For)) { // for loops
+            std::string outSource;
             std::cout << "(STATEMENT)-FOR_LOOP";
 
             advanceToken();
 
             match(SqrbraceL);
+            outSource.append("for ( ");
 
             if (compareToCurToken(IntLiteral)) {
                 std::cout << "..NUM_LITERAL\n";
+                outSource.append("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
                 advanceToken();
 
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n";
+
+                std::string iterator;
+
+                if (compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
+                    iterator = std::to_string(curToken.getTokenText().length());
+                } else {
+                    iterator = curToken.getTokenText();
+                }
+                outSource.append("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
+
                 advanceToken();
 
             }
