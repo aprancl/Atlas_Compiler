@@ -163,8 +163,7 @@ private:
             std::string token_text;
             if (lastToken.getType() == StringKW) {
                 token_text = "S_" + curToken.getTokenText();
-                emitter.emitHeader("char " + curToken.getTokenText());
-
+                // header append not necessary
             } else if (lastToken.getType() == NumKW) {
                 if (isVarFloat() || farBackToken.getType() == Input) {
                     token_text = "F_" + curToken.getTokenText();
@@ -207,6 +206,12 @@ private:
 
     // End Of Statement
     void EOS() {
+
+        if (!(compareToCurToken(Eos))) {
+            printf(ANSI_COLOR_CYAN "%s\nParsing error..reached end of file before termination of statement..line number: %d",
+                   (lexer.getSource().substr(0, lexer.getCurPosition()) + " <-*").c_str(), lexer.getCurLineNumber());
+            exit(35);
+        }
 
         std::cout << "END OF STATEMENT" << std::endl;
 
@@ -326,12 +331,14 @@ private:
         // for print (STATEMENT)
         if (compareToCurToken(Write)) { //  System.out.println() statement
             std::cout << "(STATEMENT)-WRITE\n";
-            advanceToken(); // the next token is a space, and it gets stuck
+            advanceToken();
 
             // search for string literal, identifier, or  expression
             if (compareToCurToken(StringLiteral)) {
                 emitter.emitLine((std::string) ("printf(\"") + curToken.getTokenText() + "\\n\");");
                 advanceToken();
+            } else if (compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
+                emitter.emitLine((std::string) ("printf(\"%s\\n\",") + curToken.getTokenText() + ");");
             } else if (compareToCurToken(Identifier) || compareToCurToken(IntLiteral) ||
                        compareToCurToken(FloatLiteral)) {
                 emitter.emit((std::string) ("printf(\"%") + ".2f\\n\", (float)(");
@@ -342,12 +349,9 @@ private:
                 exit(35);
             }
 
-            if (compareToCurToken(Eos)) {
-                EOS();
-            } else {
-                printf(ANSI_COLOR_CYAN "Parsing error..expected <;> (update this with \\n characters later)\n");
-                exit(35);
-            }
+            advanceToken();
+            EOS();
+
 
         } else if (compareToCurToken(StringKW)) { // variable assignment of type string
 
@@ -366,16 +370,14 @@ private:
             }
 
             match(Identifier);
-            outSource.append(lastToken.getTokenText());
+            outSource.append("char " + lastToken.getTokenText());
             match(Eq);
-            outSource.append(" " + lastToken.getTokenText() + " ");
 
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n";
 
                 strLen = std::to_string(curToken.getTokenText().length());
-                emitter.emitHeader("[" + strLen + "];");
-
+                outSource.append("[" + strLen + "] = ");
                 outSource.append("\"" + curToken.getTokenText() + "\"");
                 advanceToken();
 

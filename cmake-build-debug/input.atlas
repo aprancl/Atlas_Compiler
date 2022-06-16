@@ -1,4 +1,4 @@
+CC troubleshooting
 
 STRING name = "Anthony";
-
 WRITE name;
