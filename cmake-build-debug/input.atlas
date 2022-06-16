@@ -1,17 +1,4 @@
 
-WRITE "How man fibonacci numbers do you want?";
-INPUT NUM nums;
-WRITE " ";
+STRING name = "Anthony";
 
-NUM a = 0;
-NUM b = 1;
-NUM c = 0;
-
-WHILE [nums > 0] {
-
-    WRITE a;
-    c = a + b;
-    a = b;
-    b = c;
-    nums = nums - 1;
-};
+WRITE name;

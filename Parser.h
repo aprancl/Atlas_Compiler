@@ -163,7 +163,8 @@ private:
             std::string token_text;
             if (lastToken.getType() == StringKW) {
                 token_text = "S_" + curToken.getTokenText();
-                emitter.emitHeader("String "); // there is no string keyword in c! whoops...
+                emitter.emitHeader("char " + curToken.getTokenText());
+
             } else if (lastToken.getType() == NumKW) {
                 if (isVarFloat() || farBackToken.getType() == Input) {
                     token_text = "F_" + curToken.getTokenText();
@@ -172,8 +173,8 @@ private:
                     token_text = "I_" + curToken.getTokenText();
                     emitter.emitHeader("int ");
                 }
+                emitter.emitHeaderLine(token_text.substr(2) + ";");
             }
-            emitter.emitHeaderLine(token_text.substr(2) + ";");
             declared_vars.push_back(token_text); // the variable is finally documented
 
         }
@@ -350,8 +351,12 @@ private:
 
         } else if (compareToCurToken(StringKW)) { // variable assignment of type string
 
+            std::string outSource;
+            std::string strLen;
+
             std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_STRING";
             advanceToken();
+
 
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
                 printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable <%s>..line number: %d",
@@ -361,10 +366,17 @@ private:
             }
 
             match(Identifier);
+            outSource.append(lastToken.getTokenText());
             match(Eq);
+            outSource.append(" " + lastToken.getTokenText() + " ");
 
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n";
+
+                strLen = std::to_string(curToken.getTokenText().length());
+                emitter.emitHeader("[" + strLen + "];");
+
+                outSource.append("\"" + curToken.getTokenText() + "\"");
                 advanceToken();
 
             } else if (compareToCurToken(Identifier)) {
@@ -377,6 +389,9 @@ private:
 
 
             EOS();
+            outSource.append(";\n");
+            emitter.emit(outSource);
+
 
         } else if (compareToCurToken(NumKW)) { // variable assignment of type int and float
             std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_NUM";
@@ -397,10 +412,10 @@ private:
             expression();
             EOS();
             emitter.emit(lastToken.getTokenText() + "\n");
-            int x = 4;
 
         } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";
+            emitter.emitLine("// " + curToken.getTokenText()); // prints to c.out without spaces - ruins readability
             advanceToken();
 
 
@@ -560,7 +575,7 @@ public:
             statement();
         }
 
-        emitter.emitLine("return 0;");
+        emitter.emitLine("\nreturn 0;");
         emitter.emitLine("}");
         emitter.writeFile();
         std::cout << "🌐 parsing complete\n";

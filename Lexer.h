@@ -302,16 +302,17 @@ public:
         }
             // more complex tokens with indefinite lengths
         else if (curChar == "C" && lookAhead() == "C") { // comments
+
+            nextChar();
+            nextChar();
             std::string text = "";
             while (curChar != "\n") {
+                text.append(curChar);
                 nextChar();
-
-                if (curChar != "C" && curChar != " ") {
-                    text.append(curChar);
-                }
             }
-            text = text.substr(0, text.length() - 1).c_str();
+            text = text.substr(0).c_str();
             token = new Token(text, Comment);
+
         } else if (curChar == "\"") { // strings
 
             nextChar();
@@ -466,8 +467,6 @@ public:
     }
 
 };
-
-
 
 
 #endif //ATLAS_COMPILER_LEXER_H
