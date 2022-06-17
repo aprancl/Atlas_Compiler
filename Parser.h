@@ -154,19 +154,19 @@ private:
         int x = 4;
     }
 
-    void docVar(Token variable) {
+    void storeVar(Token variable) {
 
         std::string varText;
 
         if (lastToken.getType() == StringKW) {
-            varText = "S_" + curToken.getTokenText();
+            varText = "S_" + variable.getTokenText();
 
         } else if (lastToken.getType() == NumKW) {
             if (isVarFloat() || farBackToken.getType() == Input) {
-                varText = "F_" + curToken.getTokenText();
+                varText = "F_" + variable.getTokenText();
                 emitter.emitHeader("float ");
             } else {
-                varText = "I_" + curToken.getTokenText();
+                varText = "I_" + variable.getTokenText();
                 emitter.emitHeader("int ");
             }
             emitter.emitHeaderLine(varText.substr(2) + ";");
@@ -174,13 +174,13 @@ private:
         }
 
         varDict[varDict_ptr][0] = varText;
-
+        declared_vars.push_back(varText);
 
     }
 
 
     void docVal(Token value) {
-        varDict[varDict_ptr][0] = value.getTokenText();
+        varDict[varDict_ptr][1] = value.getTokenText();
     }
 
     void match(TokenType type) {//                      used to check tokens within a statement
@@ -490,31 +490,26 @@ private:
             EOCB();
 
         } else if (compareToCurToken(For)) { // for loops
-            std::string outSource;
             std::cout << "(STATEMENT)-FOR_LOOP";
 
             advanceToken();
 
             match(SqrbraceL);
-            outSource.append("for ( ");
+            emitter.emit("for ( ");
 
-            if (compareToCurToken(IntLiteral)) {
-                std::cout << "..NUM_LITERAL\n";
-                outSource.append("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
+            if (compareToCurToken(IntLiteral) || (compareToCurToken(Identifier) &&
+                                                  (getVarType(curToken) == IntLiteral ||
+                                                   getVarType(curToken) == FloatLiteral))) {
+                std::cout << "..NUM_ || FLOAT_\n";
+                emitter.emit("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
                 advanceToken();
 
-            } else if (compareToCurToken(Identifier)) {
-                std::cout << "..VARIABLE\n";
+            } else if (compareToCurToken(StringLiteral) ||
+                       compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
+                std::cout << "..String_LITERAL || _VARIABLE\n";
 
-                std::string iterator;
-
-                if (compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
-                    iterator = std::to_string(curToken.getTokenText().length());
-                } else {
-                    iterator = curToken.getTokenText();
-                }
-                outSource.append("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
-
+                std::string outSource = (compareToCurToken(StringLiteral)) ? "int i = 0; i < sizeof(\"" + curToken.getTokenText() + "\"); ++i)\n{\n" : "int i = 0; i < sizeof(" + curToken.getTokenText() + "); ++i)\n{\n";
+                emitter.emit(outSource);
                 advanceToken();
 
             }
@@ -526,6 +521,8 @@ private:
                 statement();
             }
             EOCB();
+            emitter.emit("\n}\n");
+
 
         } else if (compareToCurToken(Input)) { // input statements
             std::cout << "(STATEMENT)-INPUT";
@@ -564,7 +561,7 @@ private:
             }
 
             // get variable type
-            TokenType variableType = getVarType(curToken);
+            TokenType variableType = getVarType(curToken); // when refactor grab var name here
 
 //            match(Identifier); // advance
 
@@ -582,7 +579,7 @@ private:
             emitter.emit(" " + lastToken.getTokenText() + " ");
 
             // get literal type
-            TokenType literalType = curToken.getType();
+            TokenType literalType = curToken.getType();     // and the value here
 
 
             if (variableType == literalType || literalType == Identifier) {

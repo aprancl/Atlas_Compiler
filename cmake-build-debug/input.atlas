@@ -1,6 +1,33 @@
-CC troubleshooting
+
+CC for loop examples
 
 FOR [10] {
-    WRITE "Hello world";
+    WRITE "for loop as int literal";
+
 };
 
+NUM x = 5;
+
+FOR [x] {
+    WRITE "for loop as int Variable";
+};
+
+
+FOR ["Anthony"]{
+
+    WRITE "as string literal";
+
+};
+
+STRING name = "Cheems";
+
+FOR [name] {
+
+    WRITE name;
+
+};
+
+NUM pi = fl3.14;
+FOR [pi] {
+    WRITE pi;
+};
