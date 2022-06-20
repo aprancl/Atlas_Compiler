@@ -624,6 +624,8 @@ public:
         emitter.emitLine("}");
         emitter.writeFile();
         std::cout << "🌐 parsing complete\n";
+        std::cout << "\n-OUTPUT-\n";
+        system("clang out.c -o a.out && ./a.out");
     }
 
 

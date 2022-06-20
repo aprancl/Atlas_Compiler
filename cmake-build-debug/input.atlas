@@ -1,33 +1,10 @@
+CC Simple counting program
 
-CC for loop examples
+WRITE "Enter a number!";
+INPUT NUM x;
 
-FOR [10] {
-    WRITE "for loop as int literal";
-
-};
-
-NUM x = 5;
-
+NUM a = 1;
 FOR [x] {
-    WRITE "for loop as int Variable";
-};
-
-
-FOR ["Anthony"]{
-
-    WRITE "as string literal";
-
-};
-
-STRING name = "Cheems";
-
-FOR [name] {
-
-    WRITE name;
-
-};
-
-NUM pi = fl3.14;
-FOR [pi] {
-    WRITE pi;
+    WRITE a;
+    a = a + 1;
 };
