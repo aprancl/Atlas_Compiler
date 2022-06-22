@@ -53,3 +53,14 @@ WHILE [nums > 0] {
     b = c;
     nums = nums - 1;
 };
+
+CC Simple counting program
+
+WRITE "Enter a number!";
+INPUT NUM x;
+
+NUM a = 1;
+FOR [x] {
+    WRITE a;
+    a = a + 1;
+};

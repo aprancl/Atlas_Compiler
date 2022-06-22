@@ -17,7 +17,10 @@ class Emitter {
     std::string fullPath;
     std::string header;
     std::string outSource;
-    std::string setUp = "#include <stdio.h>\nint main() {\n";
+    std::string includeStatements = "#include <stdio.h>\n";
+    std::string userFuncDefs;
+    std::string funcMainHeader = "int main() {\n";
+//    std::string setUp = "#include <stdio.h>\nint main() {\n";
 
 public:
 
@@ -49,7 +52,7 @@ public:
         myOutFile.open(fullPath);
 
         if (myOutFile.is_open()) {
-            myOutFile << setUp + "\n" + header + "\n" + outSource;
+            myOutFile << includeStatements + userFuncDefs + funcMainHeader + "\n" + header + "\n" + outSource;
             myOutFile.close();
         } else {
             printf(ANSI_COLOR_YELLOW "\nEmitting error..could not open file path...\n%s\n...for writing\n", fullPath.c_str());

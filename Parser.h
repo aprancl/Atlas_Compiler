@@ -599,7 +599,7 @@ private:
             }
 
         } else {
-            printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
+            printf( ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
                    lexer.getCurLineNumber(),
                    lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());
             exit(36);
