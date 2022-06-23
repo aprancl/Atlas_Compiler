@@ -1,5 +1,6 @@
 STRING me = "Anthony";
 STRING he = me;
 
+
 WRITE me;
 WRITE he;

@@ -7,6 +7,7 @@
 
 #include "Lexer.h"
 #include "Emitter.h"
+#include "Variable.h"
 #include <stdio.h>
 #include <vector>
 #include <map>
@@ -21,12 +22,14 @@ class Parser {
 
     Lexer lexer;
     Emitter emitter;
+
     Token farBackToken;
     Token lastToken;
     Token curToken;
     Token nextToken;
+
     std::vector<std::string> declared_vars;
-    std::map<std::string, std::string> varDict;
+    std::map<std::string, std::string> varMap;
 
 public:
     // constructors
@@ -52,12 +55,12 @@ private:
 
     bool isUsedIdentifier(std::string tokenText) {
 
-        if (varDict.size() == 0) {
+        if (varMap.size() == 0) {
             return 0;
         } else {
-            auto i = varDict.begin();
+            auto i = varMap.begin();
 
-            while (i != varDict.end()) {
+            while (i != varMap.end()) {
 
                 if (tokenText == i->first.substr(2)) {
                     return 1;
@@ -72,14 +75,18 @@ private:
     }
 
 
+    // will need to refactor
+
     TokenType getVarType(Token variable) {
+
+        // RE: loop through Variables by ith->token.getToken().getTokenText() --- (v.name()=i.name()) ? ith.getDataType()
 
         if (isUsedIdentifier(variable.getTokenText())) {
 
             std::string data_type_repr;
-            auto i = varDict.begin();
+            auto i = varMap.begin();
 
-            while (i != varDict.end()) {
+            while (i != varMap.end()) {
 
                 if (i->first.substr(2) == variable.getTokenText()) {
                     data_type_repr = i->first.substr(0, 1);
@@ -162,49 +169,21 @@ private:
         int x = 4;
     }
 
-//    void storeVar(Token variable) {
+
 //
-//        std::string varText;
+//    std::string getVal(std::string varName) {
 //
-//        if (lastToken.getType() == StringKW) {
-//            varText = "S_" + variable.getTokenText();
-//
-//        } else if (lastToken.getType() == NumKW) {
-//            if (isVarFloat() || farBackToken.getType() == Input) {
-//                varText = "F_" + variable.getTokenText();
-//                emitter.emitHeader("float ");
-//            } else {
-//                varText = "I_" + variable.getTokenText();
-//                emitter.emitHeader("int ");
+//        auto i = varMap.begin();
+//        while (i != varMap.end()) {
+//            std::string decVar = i->first.substr(2);
+//            if (varName == decVar) {
+//                return varMap[i->first];
 //            }
-//            emitter.emitHeaderLine(varText.substr(2) + ";");
-//
+//            ++i;
 //        }
-//
-//        varDict[varDict_ptr][0] = varText;
-//        declared_vars.push_back(varText);
+//        return "garbage";
 //
 //    }
-
-
-//    void docVal(Token value) {
-//        varDict[varDict_ptr][1] = value.getTokenText();
-//    }
-
-
-    std::string getVal(std::string varName) {
-
-        auto i = varDict.begin();
-        while (i != varDict.end()) {
-            std::string decVar = i->first.substr(2);
-            if (varName == decVar) {
-                return varDict[i->second];
-            }
-            ++i;
-        }
-        return "garbage";
-
-    }
 
     void match(TokenType type) {//                      used to check tokens within a statement
         if (!(compareToCurToken(type))) {
@@ -260,7 +239,7 @@ private:
 
             }
 
-            varDict[dTypeAbrev + curToken.getTokenText()] = "&&&";
+            varMap[dTypeAbrev + curToken.getTokenText()] = "&&&";
         }
         advanceToken();
 
@@ -463,7 +442,7 @@ private:
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n";
 
-                varDict["S_" + farBackToken.getTokenText()] = curToken.getTokenText();
+                varMap["S_" + farBackToken.getTokenText()] = curToken.getTokenText();
 
                 strLen = std::to_string(curToken.getTokenText().length());
                 outSource.append("[" + strLen + "] = ");
@@ -473,7 +452,7 @@ private:
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n";
 
-                varDict["S_" + farBackToken.getTokenText()] = "@" + curToken.getTokenText();
+                varMap["S_" + farBackToken.getTokenText()] = "@" + curToken.getTokenText();
 
                 strLen = std::to_string(getVal(curToken.getTokenText()).length());
 

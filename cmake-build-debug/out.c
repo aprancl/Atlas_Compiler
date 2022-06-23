@@ -3,7 +3,7 @@ int main() {
 
 
 char me[7] = "Anthony";
-char he[0] = "";
+char he[7] = "Anthony";
 printf("%s\n",me);
 printf("%s\n",he);
 
