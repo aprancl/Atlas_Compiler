@@ -1,10 +1,5 @@
-CC Simple counting program
+STRING me = "Anthony";
+STRING he = me;
 
-WRITE "Enter a number!";
-INPUT NUM x;
-
-NUM a = 1;
-FOR [x] {
-    WRITE a;
-    a = a + 1;
-};
+WRITE me;
+WRITE he;

@@ -1,19 +1,11 @@
 #include <stdio.h>
-
 int main() {
 
-    float x;
-    int a;
 
-//  Simple counting program
-    printf("Enter a number!\n");
-    scanf("%f", &x);
-    a = 1;
-    for (int i = 0; i < x; ++i) {
-        printf("%.2f\n", (float) (a));
-        a = a + 1;
+char me[7] = "Anthony";
+char he[0] = "";
+printf("%s\n",me);
+printf("%s\n",he);
 
-    }
-
-    return 0;
+return 0;
 }

@@ -9,6 +9,7 @@
 #include "Emitter.h"
 #include <stdio.h>
 #include <vector>
+#include <map>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
@@ -25,8 +26,7 @@ class Parser {
     Token curToken;
     Token nextToken;
     std::vector<std::string> declared_vars;
-    std::vector<std::vector<std::string>> varDict;
-    int varDict_ptr;
+    std::map<std::string, std::string> varDict;
 
 public:
     // constructors
@@ -34,7 +34,6 @@ public:
     Parser() = default;
 
     Parser(Lexer lexer, Emitter emitter) {
-        varDict_ptr = 0;
         this->lexer = lexer;
         this->emitter = emitter;
         farBackToken = Token("", None);
@@ -52,14 +51,19 @@ private:
     // helper methods
 
     bool isUsedIdentifier(std::string tokenText) {
-        if (this->declared_vars.size() == 0) {
-            return 0;
 
+        if (varDict.size() == 0) {
+            return 0;
         } else {
-            for (std::string var: declared_vars) {
-                if (var.substr(2) == tokenText) {
+            auto i = varDict.begin();
+
+            while (i != varDict.end()) {
+
+                if (tokenText == i->first.substr(2)) {
                     return 1;
                 }
+                ++i;
+
             }
             return 0;
 
@@ -70,22 +74,26 @@ private:
 
     TokenType getVarType(Token variable) {
 
-        if (variable.getType() == Identifier) {
+        if (isUsedIdentifier(variable.getTokenText())) {
 
-            for (std::string dec_var: declared_vars) {
+            std::string data_type_repr;
+            auto i = varDict.begin();
 
-                if (dec_var.substr(2) == variable.getTokenText()) {
-                    return (dec_var[0] == 'S') ? StringLiteral : (dec_var[0] == 'I') ? IntLiteral : FloatLiteral;
+            while (i != varDict.end()) {
+
+                if (i->first.substr(2) == variable.getTokenText()) {
+                    data_type_repr = i->first.substr(0, 1);
+                    break;
                 }
+                ++i;
 
             }
 
-            printf(ANSI_COLOR_CYAN"\nParsing error..variable either of unknown type or is repeat..idk bro, this should never print\n");
-            exit(-1);
-
+            return (data_type_repr == "S") ? StringLiteral : (data_type_repr == "I") ? IntLiteral : FloatLiteral;
 
         } else {
-            // error of type referencing variable <var> before declaration
+            printf(ANSI_COLOR_CYAN"\nParsing error..variable referenced before definition\n");
+            exit(-1);
         }
 
     }
@@ -154,33 +162,48 @@ private:
         int x = 4;
     }
 
-    void storeVar(Token variable) {
+//    void storeVar(Token variable) {
+//
+//        std::string varText;
+//
+//        if (lastToken.getType() == StringKW) {
+//            varText = "S_" + variable.getTokenText();
+//
+//        } else if (lastToken.getType() == NumKW) {
+//            if (isVarFloat() || farBackToken.getType() == Input) {
+//                varText = "F_" + variable.getTokenText();
+//                emitter.emitHeader("float ");
+//            } else {
+//                varText = "I_" + variable.getTokenText();
+//                emitter.emitHeader("int ");
+//            }
+//            emitter.emitHeaderLine(varText.substr(2) + ";");
+//
+//        }
+//
+//        varDict[varDict_ptr][0] = varText;
+//        declared_vars.push_back(varText);
+//
+//    }
 
-        std::string varText;
 
-        if (lastToken.getType() == StringKW) {
-            varText = "S_" + variable.getTokenText();
+//    void docVal(Token value) {
+//        varDict[varDict_ptr][1] = value.getTokenText();
+//    }
 
-        } else if (lastToken.getType() == NumKW) {
-            if (isVarFloat() || farBackToken.getType() == Input) {
-                varText = "F_" + variable.getTokenText();
-                emitter.emitHeader("float ");
-            } else {
-                varText = "I_" + variable.getTokenText();
-                emitter.emitHeader("int ");
+
+    std::string getVal(std::string varName) {
+
+        auto i = varDict.begin();
+        while (i != varDict.end()) {
+            std::string decVar = i->first.substr(2);
+            if (varName == decVar) {
+                return varDict[i->second];
             }
-            emitter.emitHeaderLine(varText.substr(2) + ";");
-
+            ++i;
         }
+        return "garbage";
 
-        varDict[varDict_ptr][0] = varText;
-        declared_vars.push_back(varText);
-
-    }
-
-
-    void docVal(Token value) {
-        varDict[varDict_ptr][1] = value.getTokenText();
     }
 
     void match(TokenType type) {//                      used to check tokens within a statement
@@ -210,6 +233,37 @@ private:
 
         }
         advanceToken();
+    }
+
+    // method overloading!
+    void match(TokenType var, TokenType dataType) {
+
+        if (!(compareToCurToken(var))) {
+            printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s> ..line number: %d\n",
+                   Token::typeToString(var).c_str(),
+                   Token::typeToString(this->curToken.getType()).c_str(), lexer.getCurLineNumber());
+            exit(35); //  stop program && parsing
+        } else if (compareToCurToken(Identifier)) {
+
+            std::string dTypeAbrev;
+            switch (dataType) {
+                case StringLiteral:
+                    dTypeAbrev = "S_";
+                    break;
+                case IntLiteral:
+                    dTypeAbrev = "I_";
+                    break;
+                case FloatLiteral:
+                    dTypeAbrev = "F_";
+                    break;
+
+
+            }
+
+            varDict[dTypeAbrev + curToken.getTokenText()] = "&&&";
+        }
+        advanceToken();
+
     }
 
 
@@ -402,12 +456,14 @@ private:
                 exit(35);
             }
 
-            match(Identifier);
+            match(Identifier, StringLiteral);
             outSource.append("char " + lastToken.getTokenText());
             match(Eq);
 
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n";
+
+                varDict["S_" + farBackToken.getTokenText()] = curToken.getTokenText();
 
                 strLen = std::to_string(curToken.getTokenText().length());
                 outSource.append("[" + strLen + "] = ");
@@ -416,6 +472,15 @@ private:
 
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n";
+
+                varDict["S_" + farBackToken.getTokenText()] = "@" + curToken.getTokenText();
+
+                strLen = std::to_string(getVal(curToken.getTokenText()).length());
+
+                outSource.append("[" + strLen + "] = ");
+
+                outSource.append("\"" + getVal(curToken.getTokenText()) + "\"");
+
                 advanceToken();
             } else {
                 printf(ANSI_COLOR_CYAN "\nParsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
@@ -508,7 +573,10 @@ private:
                        compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
                 std::cout << "..String_LITERAL || _VARIABLE\n";
 
-                std::string outSource = (compareToCurToken(StringLiteral)) ? "int i = 0; i < sizeof(\"" + curToken.getTokenText() + "\"); ++i)\n{\n" : "int i = 0; i < sizeof(" + curToken.getTokenText() + "); ++i)\n{\n";
+                std::string outSource = (compareToCurToken(StringLiteral)) ? "int i = 0; i < sizeof(\"" +
+                                                                             curToken.getTokenText() + "\"); ++i)\n{\n"
+                                                                           : "int i = 0; i < sizeof(" +
+                                                                             curToken.getTokenText() + "); ++i)\n{\n";
                 emitter.emit(outSource);
                 advanceToken();
 
@@ -599,7 +667,7 @@ private:
             }
 
         } else {
-            printf( ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
+            printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
                    lexer.getCurLineNumber(),
                    lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());
             exit(36);
