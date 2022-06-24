@@ -19,7 +19,7 @@
 
 class Parser {
 
-
+    // data members
     Lexer lexer;
     Emitter emitter;
 
@@ -28,8 +28,9 @@ class Parser {
     Token curToken;
     Token nextToken;
 
-    std::vector<std::string> declared_vars;
-    std::map<std::string, std::string> varMap;
+    std::vector<std::string> declared_vars; // original and insufficient way of tracking variables
+    std::map<std::string, std::string> varMap; // failed attempt to rectify issues of former problem
+    std::vector<Variable> variables; // hopefully a sufficient solution to my plights
 
 public:
     // constructors
@@ -53,23 +54,35 @@ private:
 
     // helper methods
 
-    bool isUsedIdentifier(std::string tokenText) {
+    Variable findVar(std::string name){
 
-        if (varMap.size() == 0) {
+        for (int i = 0; i < variables.size(); ++i){
+
+            std::string decVarName = variables[i].getName();
+
+            if (decVarName == name ){
+                return variables[i];
+            }
+
+        }
+
+    }
+
+    bool isUsedIdentifier(std::string varName) {
+
+        if (variables.size() == 0) {
             return 0;
+
         } else {
-            auto i = varMap.begin();
+            for (int i = 0; i < variables.size(); ++i) {
 
-            while (i != varMap.end()) {
+                std::string decVarName = variables[i].getName();
 
-                if (tokenText == i->first.substr(2)) {
+                if (varName == decVarName){
                     return 1;
                 }
-                ++i;
-
             }
             return 0;
-
         }
 
     }
@@ -170,20 +183,6 @@ private:
     }
 
 
-//
-//    std::string getVal(std::string varName) {
-//
-//        auto i = varMap.begin();
-//        while (i != varMap.end()) {
-//            std::string decVar = i->first.substr(2);
-//            if (varName == decVar) {
-//                return varMap[i->first];
-//            }
-//            ++i;
-//        }
-//        return "garbage";
-//
-//    }
 
     void match(TokenType type) {//                      used to check tokens within a statement
         if (!(compareToCurToken(type))) {
@@ -421,12 +420,12 @@ private:
 
         } else if (compareToCurToken(StringKW)) { // variable assignment of type string
 
-            std::string outSource;
-            std::string strLen;
-
             std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_STRING";
-            advanceToken();
 
+            // Source to be emitted at end of statement
+            std::string outSource;
+
+            advanceToken();
 
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
                 printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable <%s>..line number: %d",
@@ -439,26 +438,41 @@ private:
             outSource.append("char " + lastToken.getTokenText());
             match(Eq);
 
+
+            std::string strLen; // method by which char array of proper size is emitted
             if (compareToCurToken(StringLiteral)) {
-                std::cout << "..LITERAL\n";
+                std::cout << "..LITERAL\n"; // header
 
+                // old way of documenting var
                 varMap["S_" + farBackToken.getTokenText()] = curToken.getTokenText();
+                // ---
+                // new way of documenting var
+                Variable str(farBackToken.getTokenText(), curToken.getTokenText(), StringLiteral);
+                variables.push_back(str);
+                // ---
 
+                // emitting code
                 strLen = std::to_string(curToken.getTokenText().length());
                 outSource.append("[" + strLen + "] = ");
                 outSource.append("\"" + curToken.getTokenText() + "\"");
                 advanceToken();
 
             } else if (compareToCurToken(Identifier)) {
-                std::cout << "..VARIABLE\n";
+                std::cout << "..VARIABLE\n"; // header
 
+                // old way of documenting var
                 varMap["S_" + farBackToken.getTokenText()] = "@" + curToken.getTokenText();
+                // ---
+                // new way of documenting var
+                Variable str(farBackToken.getTokenText(), findVar(curToken.getTokenText()));
+                variables.push_back(str);
+                // ---
 
-                strLen = std::to_string(getVal(curToken.getTokenText()).length());
+                strLen = std::to_string(str.getValue().length());
 
                 outSource.append("[" + strLen + "] = ");
 
-                outSource.append("\"" + getVal(curToken.getTokenText()) + "\"");
+                outSource.append("\"" + str.getValue() + "\"");
 
                 advanceToken();
             } else {

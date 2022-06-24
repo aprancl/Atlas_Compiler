@@ -1,6 +1,7 @@
 STRING me = "Anthony";
-STRING he = me;
-
+STRING person = "Erick";
+STRING friend = person;
 
 WRITE me;
-WRITE he;
+WRITE person;
+WRITE friend;

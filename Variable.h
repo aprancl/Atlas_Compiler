@@ -13,59 +13,67 @@ class Variable {
     std::string name;
     std::string value;
     TokenType dataType;
-    std::string prefix;
-    Variable *ptrVal;
+//    std::string prefix;
+    Variable *ptrVar;
 
 public:
     //constructors
     Variable() = default;
 
     // normal variable
-    Variable(std::string name, std::string value, TokenType dataType, std::string prefix) {
+    Variable(std::string name, std::string value, TokenType dataType) {
         this->name = name;
         this->value = value;
         this->dataType = dataType;
-        this->prefix = prefix;
-        ptrVal = NULL;
+//        this->prefix = prefix;
+        ptrVar = NULL;
     }
 
     // variable pointing to another variable...
-    Variable(std::string name, Variable ptrVal) {
+    Variable(std::string name, Variable ptrVar) {
         this->name = name;
-        this->ptrVal = &ptrVal;
-        this->value = ptrVal.getValue();
-        this->dataType = ptrVal.getDataType();
-        this->prefix = (dataType == StringLiteral) ? "S_" : (dataType == IntLiteral) ? "I_" : "F_";
+        this->ptrVar = &ptrVar;
+        this->value = ptrVar.getValue();
+        this->dataType = ptrVar.getDataType();
+//        this->prefix = (dataType == StringLiteral) ? "S_" : (dataType == IntLiteral) ? "I_" : "F_";
     }
 
     // getters
 
-    TokenType getDataType() {
-        return dataType;
+    std::string getName(){
+        return name;
     }
 
     std::string getValue() {
         return value;
     }
 
-    std::string getPrefix() {
-        return prefix;
+    TokenType getDataType() {
+        return dataType;
+    }
+
+//    std::string getPrefix() {
+//        return prefix;
+//    }
+
+    Variable* getptrVar(){
+        return ptrVar;
     }
 
     //setters
-    void setPrefix(TokenType prefix) {
-        this->prefix = prefix;
+    void setName(std::string name){
+        this->name = name;
     }
 
     void setValue(std::string value) {
         this->value = value;
     }
 
-    void setPrefix(std::string prefix) {
-        this->prefix = prefix;
-    }
+//    void setPrefix(TokenType prefix) {
+//        this->prefix = prefix;
+//    }
 
-    // helper method
+    // helper methods
 
 };
 
