@@ -2,12 +2,14 @@
 int main() {
 
 
-char me[7] = "Anthony";
-char person[5] = "Erick";
-char friend[5] = "Erick";
+char me[8] = "Anthony\0";
+char person[6] = "Erick\0";
+char fri[6] = "Erick\0";
+char other[8] = "Anthony\0";
 printf("%s\n",me);
 printf("%s\n",person);
-printf("%s\n",friend);
+printf("%s\n",fri);
+printf("%s\n",other);
 
 return 0;
 }

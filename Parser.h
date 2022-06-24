@@ -54,13 +54,13 @@ private:
 
     // helper methods
 
-    Variable findVar(std::string name){
+    Variable findVar(std::string name) {
 
-        for (int i = 0; i < variables.size(); ++i){
+        for (int i = 0; i < variables.size(); ++i) {
 
             std::string decVarName = variables[i].getName();
 
-            if (decVarName == name ){
+            if (decVarName == name) {
                 return variables[i];
             }
 
@@ -78,7 +78,7 @@ private:
 
                 std::string decVarName = variables[i].getName();
 
-                if (varName == decVarName){
+                if (varName == decVarName) {
                     return 1;
                 }
             }
@@ -88,28 +88,17 @@ private:
     }
 
 
-    // will need to refactor
 
-    TokenType getVarType(Token variable) {
+    TokenType findIdentType(Token identifier) {
 
-        // RE: loop through Variables by ith->token.getToken().getTokenText() --- (v.name()=i.name()) ? ith.getDataType()
+        if (isUsedIdentifier(identifier.getTokenText())) {
 
-        if (isUsedIdentifier(variable.getTokenText())) {
-
-            std::string data_type_repr;
-            auto i = varMap.begin();
-
-            while (i != varMap.end()) {
-
-                if (i->first.substr(2) == variable.getTokenText()) {
-                    data_type_repr = i->first.substr(0, 1);
-                    break;
+            std::string varName = identifier.getTokenText();
+            for (int i = 0; i < variables.size(); ++i) {
+                if (identifier.getTokenText() == varName){
+                    return variables[i].getDataType();
                 }
-                ++i;
-
             }
-
-            return (data_type_repr == "S") ? StringLiteral : (data_type_repr == "I") ? IntLiteral : FloatLiteral;
 
         } else {
             printf(ANSI_COLOR_CYAN"\nParsing error..variable referenced before definition\n");
@@ -181,7 +170,6 @@ private:
         nextToken = nToken;
         int x = 4;
     }
-
 
 
     void match(TokenType type) {//                      used to check tokens within a statement
@@ -393,7 +381,7 @@ private:
     void statement() { // this is the meat of the parser
 
         // for print (STATEMENT)
-        if (compareToCurToken(Write)) { //  System.out.println() statement
+        if (compareToCurToken(Write)) { // print statement
             std::cout << "(STATEMENT)-WRITE\n";
             advanceToken();
 
@@ -401,7 +389,7 @@ private:
             if (compareToCurToken(StringLiteral)) {
                 emitter.emitLine((std::string) ("printf(\"") + curToken.getTokenText() + "\\n\");");
                 advanceToken();
-            } else if (compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
+            } else if (compareToCurToken(Identifier) && findIdentType(curToken) == StringLiteral) {
                 emitter.emitLine((std::string) ("printf(\"%s\\n\",") + curToken.getTokenText() + ");");
                 advanceToken();
             } else if (compareToCurToken(Identifier) || compareToCurToken(IntLiteral) ||
@@ -452,9 +440,9 @@ private:
                 // ---
 
                 // emitting code
-                strLen = std::to_string(curToken.getTokenText().length());
+                strLen = std::to_string(curToken.getTokenText().length() + 1);
                 outSource.append("[" + strLen + "] = ");
-                outSource.append("\"" + curToken.getTokenText() + "\"");
+                outSource.append("\"" + curToken.getTokenText() + "\\0\"");
                 advanceToken();
 
             } else if (compareToCurToken(Identifier)) {
@@ -468,11 +456,11 @@ private:
                 variables.push_back(str);
                 // ---
 
-                strLen = std::to_string(str.getValue().length());
+                strLen = std::to_string(str.getValue().length() + 1);
 
                 outSource.append("[" + strLen + "] = ");
 
-                outSource.append("\"" + str.getValue() + "\"");
+                outSource.append("\"" + str.getValue() + "\\0\"");
 
                 advanceToken();
             } else {
@@ -556,14 +544,14 @@ private:
             emitter.emit("for ( ");
 
             if (compareToCurToken(IntLiteral) || (compareToCurToken(Identifier) &&
-                                                  (getVarType(curToken) == IntLiteral ||
-                                                   getVarType(curToken) == FloatLiteral))) {
+                                                  (findIdentType(curToken) == IntLiteral ||
+                                                   findIdentType(curToken) == FloatLiteral))) {
                 std::cout << "..NUM_ || FLOAT_\n";
                 emitter.emit("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
                 advanceToken();
 
             } else if (compareToCurToken(StringLiteral) ||
-                       compareToCurToken(Identifier) && getVarType(curToken) == StringLiteral) {
+                       compareToCurToken(Identifier) && findIdentType(curToken) == StringLiteral) {
                 std::cout << "..String_LITERAL || _VARIABLE\n";
 
                 std::string outSource = (compareToCurToken(StringLiteral)) ? "int i = 0; i < sizeof(\"" +
@@ -622,7 +610,7 @@ private:
             }
 
             // get variable type
-            TokenType variableType = getVarType(curToken); // when refactor grab var name here
+            TokenType variableType = findIdentType(curToken); // when refactor grab var name here
 
 //            match(Identifier); // advance
 
