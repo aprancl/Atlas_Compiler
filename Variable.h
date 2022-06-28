@@ -13,7 +13,6 @@ class Variable {
     std::string name;
     std::string value;
     TokenType dataType;
-//    std::string prefix;
     Variable *ptrVar;
 
 public:
@@ -25,7 +24,6 @@ public:
         this->name = name;
         this->value = value;
         this->dataType = dataType;
-//        this->prefix = prefix;
         ptrVar = NULL;
     }
 
@@ -52,10 +50,6 @@ public:
         return dataType;
     }
 
-//    std::string getPrefix() {
-//        return prefix;
-//    }
-
     Variable* getptrVar(){
         return ptrVar;
     }
@@ -68,10 +62,6 @@ public:
     void setValue(std::string value) {
         this->value = value;
     }
-
-//    void setPrefix(TokenType prefix) {
-//        this->prefix = prefix;
-//    }
 
     // helper methods
 
