@@ -433,6 +433,16 @@ public:
 
     }
 
+    void setToLastEq(){
+
+        while (curChar != "="){
+            curPosition --;
+            this->setCurChar(source.substr(curPosition, 1));
+        }
+
+        curChar = std::to_string(source[curPosition]);
+    }
+
 // getters and setters
     std::string getCurChar() {
         return curChar;
@@ -450,7 +460,7 @@ public:
         return curPosition;
     }
 
-    void setCurPostion(int position) {
+    void setCurPosition(int position) {
         this->curPosition = position;
     }
 

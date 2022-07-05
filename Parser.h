@@ -90,6 +90,7 @@ private:
     bool isVarFloat() {
 
         int startPosition = lexer.getCurPosition();
+        lexer.setToLastEq();
 
         while (lexer.getCurChar() != ";" && lexer.getCurChar() != "\0") {
 
@@ -97,7 +98,7 @@ private:
             if ((lexer.getCurChar() == "f" && lexer.getPeek() == "l") ||
                 (lexer.getCurChar() == "+" || lexer.getCurChar() == "-" || lexer.getCurChar() == "/" ||
                  lexer.getCurChar() == "*")) {
-                lexer.setCurPostion(startPosition);
+                lexer.setCurPosition(startPosition);
                 lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
                 return 1;
             }
@@ -106,7 +107,7 @@ private:
 
         }
 
-        lexer.setCurPostion(startPosition);
+        lexer.setCurPosition(startPosition);
         lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
         return 0;
 
@@ -459,6 +460,7 @@ private:
             expression();
             EOS();
             emitter.emit(lastToken.getTokenText() + "\n");
+            int x = 4; // just a debug marker
 
         } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";
