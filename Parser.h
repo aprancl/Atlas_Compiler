@@ -28,8 +28,8 @@ class Parser {
     Token curToken;
     Token nextToken;
 
-    std::vector<std::string> declared_vars; // original and insufficient way of tracking variables
-    std::map<std::string, std::string> varMap; // failed attempt to rectify issues of former problem
+//    std::vector<std::string> declared_vars; // original and insufficient way of tracking variables
+//    std::map<std::string, std::string> varMap; // failed attempt to rectify issues of former problem
     std::vector<Variable> variables; // hopefully a sufficient solution to my plights
 
 public:
@@ -87,6 +87,31 @@ private:
 
     }
 
+    bool isVarFloat() {
+
+        int startPosition = lexer.getCurPosition();
+
+        while (lexer.getCurChar() != ";" && lexer.getCurChar() != "\0") {
+
+            // if the value following the equals is explicitly a float or any type of expression: return true
+            if ((lexer.getCurChar() == "f" && lexer.getPeek() == "l") ||
+                (lexer.getCurChar() == "+" || lexer.getCurChar() == "-" || lexer.getCurChar() == "/" ||
+                 lexer.getCurChar() == "*")) {
+                lexer.setCurPostion(startPosition);
+                lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
+                return 1;
+            }
+
+            lexer.nextChar();
+
+        }
+
+        lexer.setCurPostion(startPosition);
+        lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
+        return 0;
+
+
+    }
 
 
     TokenType findIdentType(Token identifier) {
@@ -95,7 +120,7 @@ private:
 
             std::string varName = identifier.getTokenText();
             for (int i = 0; i < variables.size(); ++i) {
-                if (identifier.getTokenText() == varName){
+                if (identifier.getTokenText() == varName) {
                     return variables[i].getDataType();
                 }
             }
@@ -118,28 +143,6 @@ private:
                 token.getType() == Fslash);
     }
 
-    bool isVarFloat() {
-
-        int startPosition = lexer.getCurPosition();
-
-        while (lexer.getCurChar() != ";" && lexer.getCurChar() != "\0") {
-
-            if (lexer.getCurChar() == "f" && lexer.getPeek() == "l") {
-                lexer.setCurPostion(startPosition);
-                lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
-                return 1;
-            }
-
-            lexer.nextChar();
-
-        }
-
-        lexer.setCurPostion(startPosition);
-        lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
-        return 0;
-
-
-    }
 
     // compare a given token to what the current token is
     bool compareToLastToken(TokenType type) {
@@ -178,60 +181,9 @@ private:
                    Token::typeToString(type).c_str(),
                    Token::typeToString(this->curToken.getType()).c_str(), lexer.getCurLineNumber());
             exit(35); //  stop program && parsing
-        } else if (compareToCurToken(Identifier)) {
-
-            // if we are declaring a variable, we want to document it and its data type
-            std::string token_text;
-            if (lastToken.getType() == StringKW) {
-                token_text = "S_" + curToken.getTokenText();
-                // header append not necessary
-            } else if (lastToken.getType() == NumKW) {
-                if (isVarFloat() || farBackToken.getType() == Input) {
-                    token_text = "F_" + curToken.getTokenText();
-                    emitter.emitHeader("float ");
-                } else {
-                    token_text = "I_" + curToken.getTokenText();
-                    emitter.emitHeader("int ");
-                }
-                emitter.emitHeaderLine(token_text.substr(2) + ";");
-            }
-            declared_vars.push_back(token_text); // the variable is finally documented
-
         }
         advanceToken();
     }
-
-    // method overloading!
-    void match(TokenType var, TokenType dataType) {
-
-        if (!(compareToCurToken(var))) {
-            printf(ANSI_COLOR_CYAN "\nParsing error..expected <%s> but got <%s> ..line number: %d\n",
-                   Token::typeToString(var).c_str(),
-                   Token::typeToString(this->curToken.getType()).c_str(), lexer.getCurLineNumber());
-            exit(35); //  stop program && parsing
-        } else if (compareToCurToken(Identifier)) {
-
-            std::string dTypeAbrev;
-            switch (dataType) {
-                case StringLiteral:
-                    dTypeAbrev = "S_";
-                    break;
-                case IntLiteral:
-                    dTypeAbrev = "I_";
-                    break;
-                case FloatLiteral:
-                    dTypeAbrev = "F_";
-                    break;
-
-
-            }
-
-            varMap[dTypeAbrev + curToken.getTokenText()] = "&&&";
-        }
-        advanceToken();
-
-    }
-
 
 // the following is a series of functions that represent the various levels of abstraction in this programming language's grammar
 // ie. a program consists of statements and statement consists of a combination of keywords and symbols etc...
@@ -422,7 +374,7 @@ private:
                 exit(35);
             }
 
-            match(Identifier, StringLiteral);
+            match(Identifier);
             outSource.append("char " + lastToken.getTokenText());
             match(Eq);
 
@@ -431,9 +383,6 @@ private:
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n"; // header
 
-                // old way of documenting var
-                varMap["S_" + farBackToken.getTokenText()] = curToken.getTokenText();
-                // ---
                 // new way of documenting var
                 Variable str(farBackToken.getTokenText(), curToken.getTokenText(), StringLiteral);
                 variables.push_back(str);
@@ -448,9 +397,6 @@ private:
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n"; // header
 
-                // old way of documenting var
-                varMap["S_" + farBackToken.getTokenText()] = "@" + curToken.getTokenText();
-                // ---
                 // new way of documenting var
                 Variable str(farBackToken.getTokenText(), findVar(curToken.getTokenText()));
                 variables.push_back(str);
@@ -475,21 +421,41 @@ private:
 
 
         } else if (compareToCurToken(NumKW)) { // variable assignment of type int and float
-            std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_NUM";
-
+            std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_NUM"; // header
             advanceToken();
+            std::string outSource;
 
+            // check whether is used identifier && take appropriate action
+            std::string identName;
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
                 printf(ANSI_COLOR_CYAN "\nParsing error..cannot redeclare instantiated variable <%s>..line number: %d",
                        curToken.getTokenText().c_str(),
                        lexer.getCurLineNumber());
                 exit(35);
+            } else if (compareToCurToken(Identifier)) {
+                identName = curToken.getTokenText();
+                advanceToken();
+//                emitter.emit(lastToken.getTokenText() + " ");
+                outSource.append(lastToken.getTokenText() + " ");
             }
 
-            match(Identifier);
-            emitter.emit(lastToken.getTokenText() + " ");
+            // check '='
             match(Eq);
-            emitter.emit(lastToken.getTokenText() + " ");
+//            emitter.emit(lastToken.getTokenText() + " ");
+            outSource.append(lastToken.getTokenText() + " ");
+
+            // get data type
+            if (isVarFloat()) {
+
+                outSource.insert(0, "float ");
+
+            } else {
+
+                outSource.insert(0, "int ");
+
+            }
+            emitter.emit(outSource);
+
             expression();
             EOS();
             emitter.emit(lastToken.getTokenText() + "\n");

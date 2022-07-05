@@ -15,11 +15,11 @@ class Emitter {
 
     // data members
     std::string fullPath;
-    std::string header;
-    std::string outSource;
     std::string includeStatements = "#include <stdio.h>\n";
     std::string userFuncDefs;
     std::string funcMainHeader = "int main() {\n";
+    std::string header; //used for variable declarations
+    std::string outSource;
 //    std::string setUp = "#include <stdio.h>\nint main() {\n";
 
 public:

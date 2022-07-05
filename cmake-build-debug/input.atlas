@@ -1,11 +1,2 @@
-STRING me = "Anthony";
-STRING person = "Erick";
-STRING fri = person;
-STRING other = me;
-STRING temp = fri;
-
-WRITE me;
-WRITE person;
-WRITE fri;
-WRITE other;
-WRITE temp;
+NUM x = 5;
+NUM pi = fl3.14;
