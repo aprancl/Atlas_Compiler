@@ -445,22 +445,29 @@ private:
 //            emitter.emit(lastToken.getTokenText() + " ");
             outSource.append(lastToken.getTokenText() + " ");
 
-            // get data type
+            // emit && document data type and value
+            std::string identVal;
+            TokenType identType;
             if (isVarFloat()) {
-
                 outSource.insert(0, "float ");
+                identType = FloatLiteral;
 
             } else {
-
                 outSource.insert(0, "int ");
+                identType = IntLiteral;
 
             }
-            emitter.emit(outSource);
+            // make and save variable object
+            identVal = curToken.getTokenText();
+            Variable variable(identName, identVal, identType );
+            variables.push_back(variable);
 
+
+            emitter.emit(outSource);
             expression();
+            emitter.emit( ";\n");
+
             EOS();
-            emitter.emit(lastToken.getTokenText() + "\n");
-            int x = 4; // just a debug marker
 
         } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";

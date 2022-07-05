@@ -1,2 +1,3 @@
 NUM x = 5;
 NUM pi = fl3.14;
+NUM expr = 1 + 1;
