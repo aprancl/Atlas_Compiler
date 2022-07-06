@@ -1,10 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
 int main() {
 
+float x;
+float y;
 
-int x = 5;
-float pi = 3.14;
-float expr = 1 + 1;
+scanf("%f", &x);
+scanf("%f", &y);
+printf("%.2f\n", (float)(x + y));
 
 return 0;
 }

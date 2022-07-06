@@ -32,9 +32,6 @@ IF [r != 1]{
     };
 };
 
-
-
-
 CC Fibonacci
 
 WRITE "How man fibonacci numbers do you want?";

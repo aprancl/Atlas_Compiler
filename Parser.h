@@ -53,7 +53,6 @@ public:
 private:
 
     // helper methods
-
     Variable findVar(std::string name) {
 
         for (int i = 0; i < variables.size(); ++i) {
@@ -128,7 +127,7 @@ private:
 
         } else {
             printf(ANSI_COLOR_CYAN"\nParsing error..variable referenced before definition\n");
-            exit(-1);
+            exit(35);
         }
 
     }
@@ -172,7 +171,6 @@ private:
             nToken = lexer.getToken();
         }
         nextToken = nToken;
-        int x = 4;
     }
 
 
@@ -459,13 +457,13 @@ private:
             }
             // make and save variable object
             identVal = curToken.getTokenText();
-            Variable variable(identName, identVal, identType );
+            Variable variable(identName, identVal, identType);
             variables.push_back(variable);
 
 
             emitter.emit(outSource);
             expression();
-            emitter.emit( ";\n");
+            emitter.emit(";\n");
 
             EOS();
 
@@ -549,28 +547,49 @@ private:
 
 
         } else if (compareToCurToken(Input)) { // input statements
-            std::cout << "(STATEMENT)-INPUT";
-            std::string outSource;
+            std::cout << "(STATEMENT)-INPUT"; // header
 
-            outSource.append("scanf(");
+            std::string outSource;
             advanceToken();
 
-            std::string inputType;
             if (curToken.getType() == StringKW) {
                 std::cout << "..STRING\n";
-                inputType = "s";
+
+                // declare the string in the c.out header
+                std::string varName = nextToken.getTokenText();
+                emitter.emitHeader("char *" + varName + " = malloc(sizeof(" + varName + "));\n");
+
+                // emit info
+                emitter.emit("scanf(\"%s\", " + varName + ");\n");
+
+                // make variable
+                Variable variable(varName, varName, StringLiteral);
+                variables.push_back(variable);
+
             } else if (curToken.getType() == NumKW) {
-                std::cout << "..NUM";
-                inputType = "f";
+                std::cout << "..NUM\n"; // subheader
+
+                // declare the string in the c.out header
+                std::string varName = nextToken.getTokenText();
+                emitter.emitHeader("float " + varName + ";\n");
+
+                // emit info
+                emitter.emit("scanf(\"%f\", &" + varName + ");\n");
+
+                // make variable
+                Variable variable(varName, varName, FloatLiteral);
+                variables.push_back(variable);
+
             }
             advanceToken();
-            outSource.append("\"%" + inputType + "\",");
 
             match(Identifier);
-            outSource.append("&" + lastToken.getTokenText() + ")");
-            outSource.append(curToken.getTokenText() + "\n");
+
+
             EOS();
             emitter.emit(outSource);
+
+
 
         }
             // variable re-instantiation // x = 5; as opposed to the already declared NUM x = 4;

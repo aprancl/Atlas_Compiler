@@ -15,7 +15,7 @@ class Emitter {
 
     // data members
     std::string fullPath;
-    std::string includeStatements = "#include <stdio.h>\n";
+    std::string includeStatements = "#include <stdio.h>\n#include <stdlib.h>\n";
     std::string userFuncDefs;
     std::string funcMainHeader = "int main() {\n";
     std::string header; //used for variable declarations
