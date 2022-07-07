@@ -277,7 +277,7 @@ public:
             if (lookAhead() == "=") {
                 lastChar = curChar;
                 nextChar();
-                token = new Token(curChar.append(lastChar), GtEq);
+                token = new Token(lastChar.append(curChar), GtEq);
             } else {
                 token = new Token(curChar, Gt);
             }
@@ -285,7 +285,7 @@ public:
             if (lookAhead() == "=") {
                 lastChar = curChar;
                 nextChar();
-                token = new Token(curChar.append(lastChar), LtEq);
+                token = new Token(lastChar.append(curChar), LtEq);
             } else {
                 token = new Token(curChar, Lt);
             }
@@ -293,7 +293,7 @@ public:
             if (lookAhead() == "=") {
                 lastChar = curChar;
                 nextChar();
-                token = new Token(curChar.append(lastChar), NotEq);
+                token = new Token(lastChar.append(curChar), NotEq);
             } else {
                 printf(ANSI_COLOR_MAGENTA "Lexing error..Expected \"!=\" but got \"!%s\"", lookAhead().c_str());
                 exit(25);

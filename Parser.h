@@ -53,7 +53,7 @@ public:
 private:
 
     // helper methods
-    Variable findVar(std::string name) {
+    Variable findVarByName(std::string name) {
 
         for (int i = 0; i < variables.size(); ++i) {
 
@@ -397,7 +397,7 @@ private:
                 std::cout << "..VARIABLE\n"; // header
 
                 // new way of documenting var
-                Variable str(farBackToken.getTokenText(), findVar(curToken.getTokenText()));
+                Variable str(farBackToken.getTokenText(), findVarByName(curToken.getTokenText()));
                 variables.push_back(str);
                 // ---
 
@@ -590,11 +590,10 @@ private:
             emitter.emit(outSource);
 
 
-
         }
             // variable re-instantiation // x = 5; as opposed to the already declared NUM x = 4;
         else if (compareToCurToken(Identifier)) {
-            std::cout << "(STATEMENT)-VARIABLE_RE-INSTANTIATION\n";
+            std::cout << "(STATEMENT)-VARIABLE_RE-INSTANTIATION\n"; // header
 
             // check to see if the variable has already been declared (should be, else return parsing error)
             if (!isUsedIdentifier(curToken.getTokenText())) {
@@ -603,43 +602,25 @@ private:
                 exit(35);
             }
 
-            // get variable type
-            TokenType variableType = findIdentType(curToken); // when refactor grab var name here
+            // get the variable that needs to be manipulated and save another copy for comparison
+            Variable originVar = findVarByName(curToken.getTokenText());
+            Variable var = findVarByName(curToken.getTokenText());
 
-//            match(Identifier); // advance
-
-            if (compareToCurToken(Identifier)) {
-                emitter.emit(curToken.getTokenText());
-                advanceToken();
-            } else {
-                printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
-                       lexer.getCurLineNumber(),
-                       lexer.getSource().substr(0, lexer.getCurPosition() + 1).c_str());
-                exit(36);
-            }
-
-            match(Eq); // advance
-            emitter.emit(" " + lastToken.getTokenText() + " ");
-
-            // get literal type
-            TokenType literalType = curToken.getType();     // and the value here
-
-
-            if (variableType == literalType || literalType == Identifier) {
-                if (!(literalType == StringLiteral)) {
-                    expression();
-                } else if (literalType == StringLiteral) {
-                    match(literalType);
-                }
-                emitter.emit(curToken.getTokenText() + "\n");
-                EOS();
-
-
+            // get the new value
+            match(Eq);
+            if (!(compareToCurToken(Identifier)) && curToken.getType() == var.getDataType()) {
+                var.setValue(curToken.getTokenText());
+            } else if (compareToCurToken(Identifier) &&
+                       findVarByName(curToken.getTokenText()).getDataType() == var.getDataType()) {
+                var.setPtrVar(findVarByName(curToken.getTokenText()));
             } else {
                 printf(ANSI_COLOR_CYAN "Parsing error..variable type <%s> and literal type <%s> do not match",
-                       Token::typeToString(variableType).c_str(), Token::typeToString(literalType).c_str());
+                std::to_string(originVar.getDataType()).c_str(), std::to_string(curToken.getType()).c_str());
                 exit(35);
             }
+            emitter.emit(var.getName() + " = " + var.getValue() + ";\n");
+            advanceToken();
+            EOS();
 
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",

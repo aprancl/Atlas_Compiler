@@ -7,24 +7,31 @@ STRING name = "Anthony";
 STRING msg = "Anthony";
 WRITE "Hello, world!";
 
-CC probably "hardest" statement to parse
+CC Something "hard" to parse
+NUM bar = 10;
 NUM foo = bar * 3 + 2;
 NUM a = 1;
+NUM r = 10;
 
-IF [p != 1]{
-    STRING names = "Erick";
+IF [foo != 1]{
+    STRING name = "Erick";
     WRITE "Hola amigo!";
     NUM age = 9 * 2 + 1;
 };
 
-WHILE [q == 1]{
+NUM counter = 0;
+WHILE [a == 1]{
     WRITE "Hello world";
+    counter = counter + 1;
+    IF [counter >= 10]{
+        a = 0;
+    };
 };
 
 IF [r != 1]{
-    STRING namess = "Erick";
+    STRING names = "Erick";
     NUM ages = 9 * 2 + 1;
-    IF [ 1 == 1 ]{
+    IF [ 1 <= 1 ]{
         WRITE "I hope this parses!";
         FOR [10] {
             WRITE "Hello";

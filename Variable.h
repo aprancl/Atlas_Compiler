@@ -33,7 +33,6 @@ public:
         this->ptrVar = &ptrVar;
         this->value = ptrVar.getValue();
         this->dataType = ptrVar.getDataType();
-//        this->prefix = (dataType == StringLiteral) ? "S_" : (dataType == IntLiteral) ? "I_" : "F_";
     }
 
     // getters
@@ -61,6 +60,9 @@ public:
 
     void setValue(std::string value) {
         this->value = value;
+    }
+    void setPtrVar(Variable ptrVar){
+        new (this) Variable(this->name, ptrVar);
     }
 
     // helper methods
