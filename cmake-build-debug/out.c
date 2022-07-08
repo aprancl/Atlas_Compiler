@@ -3,9 +3,10 @@
 int main() {
 
 
-char name[8] = "Anthony\0";
-name = ;
-printf("%s\n",name);
+int counter = 0;
+int x = 4;
+counter = 1 + x;
+printf("%.2f\n", (float)(counter));
 
 return 0;
 }

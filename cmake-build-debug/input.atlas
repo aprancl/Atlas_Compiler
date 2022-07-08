@@ -1,3 +1,4 @@
-STRING name = "Anthony";
-name = "Erick";
-WRITE name;
+NUM counter = 0;
+NUM x = 4 ;
+counter = 1 + x;
+WRITE counter;

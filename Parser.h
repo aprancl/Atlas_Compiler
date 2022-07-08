@@ -358,12 +358,10 @@ private:
 
 
         } else if (compareToCurToken(StringKW)) { // variable assignment of type string
-
             std::cout << "(STATEMENT)-VARIABLE_ASSIGNMENT_STRING";
 
             // Source to be emitted at end of statement
             std::string outSource;
-
             advanceToken();
 
             if (compareToCurToken(Identifier) && isUsedIdentifier(curToken.getTokenText())) {
@@ -374,11 +372,11 @@ private:
             }
 
             match(Identifier);
-            outSource.append("char " + lastToken.getTokenText());
+            outSource.append("char *" + lastToken.getTokenText());
             match(Eq);
 
 
-            std::string strLen; // method by which char array of proper size is emitted
+//            std::string strLen; // method by which char array of proper size is emitted
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n"; // header
 
@@ -388,10 +386,9 @@ private:
                 // ---
 
                 // emitting code
-                strLen = std::to_string(curToken.getTokenText().length() + 1);
-                outSource.append("[" + strLen + "] = ");
-                outSource.append("\"" + curToken.getTokenText() + "\\0\"");
-                advanceToken();
+//                strLen = std::to_string(curToken.getTokenText().length() + 1);
+//                outSource.append("[" + strLen + "] = ");
+                outSource.append(" = \"" + curToken.getTokenText() + "\\0\"");
 
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n"; // header
@@ -401,17 +398,16 @@ private:
                 variables.push_back(str);
                 // ---
 
-                strLen = std::to_string(str.getValue().length() + 1);
+//                strLen = std::to_string(str.getValue().length() + 1);
 
-                outSource.append("[" + strLen + "] = ");
+//                outSource.append("[" + strLen + "] = ");
 
-                outSource.append("\"" + str.getValue() + "\\0\"");
-
-                advanceToken();
+                outSource.append(" = \"" + str.getValue() + "\\0\"");
             } else {
                 printf(ANSI_COLOR_CYAN "\nParsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
                 exit(35);
             }
+            advanceToken();
 
 
             EOS();
@@ -434,14 +430,12 @@ private:
             } else if (compareToCurToken(Identifier)) {
                 identName = curToken.getTokenText();
                 advanceToken();
-//                emitter.emit(lastToken.getTokenText() + " ");
                 outSource.append(lastToken.getTokenText() + " ");
             }
 
             // check '='
             match(Eq);
-//            emitter.emit(lastToken.getTokenText() + " ");
-            outSource.append(lastToken.getTokenText() + " ");
+            outSource.append("= ");
 
             // emit && document data type and value
             std::string identVal;
@@ -465,6 +459,7 @@ private:
             expression();
             emitter.emit(";\n");
 
+//            advanceToken();
             EOS();
 
         } else if (compareToCurToken(Comment)) { // comments
@@ -604,23 +599,52 @@ private:
 
             // get the variable that needs to be manipulated and save another copy for comparison
             Variable originVar = findVarByName(curToken.getTokenText());
-            Variable var = findVarByName(curToken.getTokenText());
-
-            // get the new value
-            match(Eq);
-            if (!(compareToCurToken(Identifier)) && curToken.getType() == var.getDataType()) {
-                var.setValue(curToken.getTokenText());
-            } else if (compareToCurToken(Identifier) &&
-                       findVarByName(curToken.getTokenText()).getDataType() == var.getDataType()) {
-                var.setPtrVar(findVarByName(curToken.getTokenText()));
-            } else {
-                printf(ANSI_COLOR_CYAN "Parsing error..variable type <%s> and literal type <%s> do not match",
-                std::to_string(originVar.getDataType()).c_str(), std::to_string(curToken.getType()).c_str());
-                exit(35);
-            }
-            emitter.emit(var.getName() + " = " + var.getValue() + ";\n");
+            Variable newVar = findVarByName(curToken.getTokenText());
             advanceToken();
+
+            match(Eq);
+
+            // potential things found at end of "="
+            // string literal
+            if (curToken.getType() == StringLiteral && originVar.getDataType() == StringLiteral) {
+                newVar.setValue(curToken.getTokenText());
+                emitter.emit(originVar.getName() + " = " + newVar.getValue());
+            }
+                // string variable
+            else if (curToken.getType() == Identifier &&
+                     findVarByName(curToken.getTokenText()).getDataType() == StringLiteral &&
+                     originVar.getDataType() == StringLiteral) {
+
+                newVar.setPtrVar(findVarByName(curToken.getTokenText()));
+                emitter.emit(originVar.getName() + " = " + newVar.getValue());
+            } else {
+                newVar.setValue(curToken.getTokenText());
+                emitter.emit(originVar.getName() + " = " );
+                expression();
+            }
+            emitter.emit(";\n");
             EOS();
+
+            // --------------------------------------------------------------------old way V
+            // get the new value
+            // if we find a literal of the same type as the variable
+//            if (!(compareToCurToken(Identifier)) && curToken.getType() == newVar.getDataType()) {
+//                newVar.setValue(curToken.getTokenText());
+//            }
+//                // if we find a variable of the same type as the variable
+//            else if (compareToCurToken(Identifier) &&
+//                     findVarByName(curToken.getTokenText()).getDataType() == newVar.getDataType()) {
+//                newVar.setPtrVar(findVarByName(curToken.getTokenText()));
+//            } else {
+//                printf(ANSI_COLOR_CYAN "Parsing error..variable type <%s> and literal type <%s> do not match",
+//                       std::to_string(originVar.getDataType()).c_str(), std::to_string(curToken.getType()).c_str());
+//                exit(35);
+//            }
+//            std::string literal = (newVar.getDataType() == StringLiteral) ? "\"" + newVar.getValue() + "\"" : newVar.getValue();
+//
+//            emitter.emit(newVar.getName() + " = " + literal + ";\n");
+//            advanceToken();
+//            EOS();
 
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
