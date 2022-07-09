@@ -3,12 +3,10 @@
 int main() {
 
 
-int x = 1;
-int y = 5;
-int z = 10;
-float p = 1 + x + y;
-float q = 1 + p + z - x;
-printf("%.2f\n", (float)(q));
+char *name = "Anthony\0";
+char *name2 = "Bob\0";
+name2 = "Anthony\0";
+printf("%s\n",name2);
 
 return 0;
 }

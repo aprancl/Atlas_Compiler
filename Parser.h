@@ -67,7 +67,7 @@ private:
 
     }
 
-    Variable* findVarPtrByName(std::string name){
+    Variable *findVarPtrByName(std::string name) {
 
         for (int i = 0; i < variables.size(); ++i) {
 
@@ -126,7 +126,8 @@ private:
 
 
     }
-    std::string readExpression(){
+
+    std::string readExpression() {
 
         std::string expression;
         int startPosition = lexer.getCurPosition();
@@ -135,7 +136,7 @@ private:
 
         while (lexer.getCurChar() != ";" && lexer.getCurChar() != "\0") {
 
-            if (lexer.getCurChar() == " "){
+            if (lexer.getCurChar() == " ") {
                 lexer.nextChar();
                 continue;
             }
@@ -486,7 +487,7 @@ private:
 
             }
             // make and save variable object
-            identVal = curToken.getTokenText();
+            identVal = readExpression();
             Variable variable(identName, identVal, identType);
             variables.push_back(variable);
 
@@ -644,18 +645,18 @@ private:
             // string literal
             if (curToken.getType() == StringLiteral && originVar.getDataType() == StringLiteral) {
                 varPtr->setValue(curToken.getTokenText());
-                emitter.emit(originVar.getName() + " = " + varPtr->getValue());
+                emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\\0\"");
+                advanceToken();
             }
                 // string variable
-            else if (curToken.getType() == Identifier &&
-                     findVarByName(curToken.getTokenText()).getDataType() == StringLiteral &&
+            else if (curToken.getType() == Identifier && varPtr->getDataType() == StringLiteral &&
                      originVar.getDataType() == StringLiteral) {
 
                 varPtr->setPtrVar(findVarByName(curToken.getTokenText()));
                 emitter.emit(originVar.getName() + " = " + varPtr->getValue());
             } else {
                 varPtr->setValue(readExpression());
-                emitter.emit(originVar.getName() + " = " );
+                emitter.emit(originVar.getName() + " = ");
                 std::string exprVal = readExpression();
 
                 expression();

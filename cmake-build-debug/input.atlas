@@ -1,8 +1,6 @@
-NUM x = 1;
-NUM y = 5;
-NUM z = 10;
+STRING name = "Anthony";
+STRING name2 = "Bob";
 
-NUM p = 1 + x + y;
-NUM q = 1 + p + z - x;
+name2 = "Anthony";
 
-WRITE q;
+WRITE name2;
