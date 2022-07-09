@@ -67,6 +67,20 @@ private:
 
     }
 
+    Variable* findVarPtrByName(std::string name){
+
+        for (int i = 0; i < variables.size(); ++i) {
+
+            std::string decVarName = variables[i].getName();
+
+            if (decVarName == name) {
+                return &variables[i];
+            }
+
+        }
+
+    }
+
     bool isUsedIdentifier(std::string varName) {
 
         if (variables.size() == 0) {
@@ -111,6 +125,28 @@ private:
         return 0;
 
 
+    }
+    std::string readExpression(){
+
+        std::string expression;
+        int startPosition = lexer.getCurPosition();
+        lexer.setToLastEq();
+        lexer.nextChar();
+
+        while (lexer.getCurChar() != ";" && lexer.getCurChar() != "\0") {
+
+            if (lexer.getCurChar() == " "){
+                lexer.nextChar();
+                continue;
+            }
+            expression.append(lexer.getCurChar());
+            lexer.nextChar();
+
+        }
+
+        lexer.setCurPosition(startPosition);
+        lexer.setCurChar(lexer.getSource().substr(lexer.getCurPosition(), 1));
+        return expression;
     }
 
 
@@ -599,7 +635,7 @@ private:
 
             // get the variable that needs to be manipulated and save another copy for comparison
             Variable originVar = findVarByName(curToken.getTokenText());
-            Variable newVar = findVarByName(curToken.getTokenText());
+            Variable *varPtr = findVarPtrByName(curToken.getTokenText());
             advanceToken();
 
             match(Eq);
@@ -607,19 +643,21 @@ private:
             // potential things found at end of "="
             // string literal
             if (curToken.getType() == StringLiteral && originVar.getDataType() == StringLiteral) {
-                newVar.setValue(curToken.getTokenText());
-                emitter.emit(originVar.getName() + " = " + newVar.getValue());
+                varPtr->setValue(curToken.getTokenText());
+                emitter.emit(originVar.getName() + " = " + varPtr->getValue());
             }
                 // string variable
             else if (curToken.getType() == Identifier &&
                      findVarByName(curToken.getTokenText()).getDataType() == StringLiteral &&
                      originVar.getDataType() == StringLiteral) {
 
-                newVar.setPtrVar(findVarByName(curToken.getTokenText()));
-                emitter.emit(originVar.getName() + " = " + newVar.getValue());
+                varPtr->setPtrVar(findVarByName(curToken.getTokenText()));
+                emitter.emit(originVar.getName() + " = " + varPtr->getValue());
             } else {
-                newVar.setValue(curToken.getTokenText());
+                varPtr->setValue(readExpression());
                 emitter.emit(originVar.getName() + " = " );
+                std::string exprVal = readExpression();
+
                 expression();
             }
             emitter.emit(";\n");

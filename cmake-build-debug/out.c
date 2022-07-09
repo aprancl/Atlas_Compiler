@@ -3,10 +3,12 @@
 int main() {
 
 
-int counter = 0;
-int x = 4;
-counter = 1 + x;
-printf("%.2f\n", (float)(counter));
+int x = 1;
+int y = 5;
+int z = 10;
+float p = 1 + x + y;
+float q = 1 + p + z - x;
+printf("%.2f\n", (float)(q));
 
 return 0;
 }

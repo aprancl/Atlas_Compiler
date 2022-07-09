@@ -68,3 +68,14 @@ FOR [x] {
     WRITE a;
     a = a + 1;
 };
+
+
+CC some variable practice with expressions
+NUM x = 1;
+NUM y = 5;
+NUM z = 10;
+
+NUM p = 1 + x + y;
+NUM q = 1 + p + z - x;
+
+WRITE q;

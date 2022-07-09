@@ -1,4 +1,8 @@
-NUM counter = 0;
-NUM x = 4 ;
-counter = 1 + x;
-WRITE counter;
+NUM x = 1;
+NUM y = 5;
+NUM z = 10;
+
+NUM p = 1 + x + y;
+NUM q = 1 + p + z - x;
+
+WRITE q;
