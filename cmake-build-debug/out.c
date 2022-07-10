@@ -5,8 +5,9 @@ int main() {
 
 char *name = "Anthony\0";
 char *name2 = "Bob\0";
-name2 = "Anthony\0";
-printf("%s\n",name2);
+char *name3 = "Bob\0";
+name3 = "Anthony";
+printf("%s\n",name3);
 
 return 0;
 }

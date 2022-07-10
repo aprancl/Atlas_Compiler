@@ -653,7 +653,8 @@ private:
                      originVar.getDataType() == StringLiteral) {
 
                 varPtr->setPtrVar(findVarByName(curToken.getTokenText()));
-                emitter.emit(originVar.getName() + " = " + varPtr->getValue());
+                emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\"");
+                advanceToken();
             } else {
                 varPtr->setValue(readExpression());
                 emitter.emit(originVar.getName() + " = ");

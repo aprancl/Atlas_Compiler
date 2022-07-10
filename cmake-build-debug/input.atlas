@@ -1,6 +1,7 @@
 STRING name = "Anthony";
 STRING name2 = "Bob";
 
-name2 = "Anthony";
+STRING name3 = name2;
+name3 = name;
 
-WRITE name2;
+WRITE name3;
