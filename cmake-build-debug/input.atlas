@@ -1,7 +1,30 @@
+CC Variable testing
+
+CC Strings
 STRING name = "Anthony";
-STRING name2 = "Bob";
+name = "Bob";
+STRING name2 = name;
+name2 = "Erick";
 
-STRING name3 = name2;
-name3 = name;
+CC integers
 
-WRITE name3;
+NUM a = 5;
+a = 2;
+NUM b = a;
+NUM x = 100;
+b = x;
+
+CC integers
+
+NUM pi = fl3.14;
+pi = fl3.999;
+NUM q = fl5.23;
+NUM y = fl1.23;
+q = y;
+
+CC expressions
+NUM expr = 1+1;
+NUM thing = 8*8;
+expr = thing + 7;
+expr = expr + 100;
+NUM expr2 = 10 * expr;

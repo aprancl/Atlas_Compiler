@@ -5,6 +5,9 @@
 #include <map>
 #include <fstream>
 
+//TODO dont allow vairable reassingment of an int to float <-- causes inaccuracies
+//TODO Fix the way that float literal are saved. instal of "fl3.14" it hould just be 3.14
+
 
 // search for the given file name on computer and return its text <- will be saved to source variable in main
 std::string getSource(std::string fileName) {
