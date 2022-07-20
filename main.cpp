@@ -5,7 +5,7 @@
 #include <map>
 #include <fstream>
 
-//TODO dont allow vairable reassingment of an int to float <-- causes inaccuracies
+//TODO dont allow vairable reassingment of an int to float  and float to int <-- causes inaccuracies
 //TODO Fix the way that float literal are saved. instal of "fl3.14" it hould just be 3.14
 
 

@@ -16,20 +16,15 @@
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 
-
 class Parser {
 
     // data members
     Lexer lexer;
     Emitter emitter;
-
     Token farBackToken;
     Token lastToken;
     Token curToken;
     Token nextToken;
-
-//    std::vector<std::string> declared_vars; // original and insufficient way of tracking variables
-//    std::map<std::string, std::string> varMap; // failed attempt to rectify issues of former problem
     std::vector<Variable> variables; // hopefully a sufficient solution to my plights
 
 public:
@@ -487,7 +482,7 @@ private:
 
             }
             // make and save variable object
-            identVal = readExpression();
+            identVal = readExpression(); // if this is a float literal, I need to somehow get rid of the fl prefix
             Variable variable(identName, identVal, identType);
             variables.push_back(variable);
 
@@ -664,27 +659,6 @@ private:
             }
             emitter.emit(";\n");
             EOS();
-
-            // --------------------------------------------------------------------old way V
-            // get the new value
-            // if we find a literal of the same type as the variable
-//            if (!(compareToCurToken(Identifier)) && curToken.getType() == newVar.getDataType()) {
-//                newVar.setValue(curToken.getTokenText());
-//            }
-//                // if we find a variable of the same type as the variable
-//            else if (compareToCurToken(Identifier) &&
-//                     findVarByName(curToken.getTokenText()).getDataType() == newVar.getDataType()) {
-//                newVar.setPtrVar(findVarByName(curToken.getTokenText()));
-//            } else {
-//                printf(ANSI_COLOR_CYAN "Parsing error..variable type <%s> and literal type <%s> do not match",
-//                       std::to_string(originVar.getDataType()).c_str(), std::to_string(curToken.getType()).c_str());
-//                exit(35);
-//            }
-//            std::string literal = (newVar.getDataType() == StringLiteral) ? "\"" + newVar.getValue() + "\"" : newVar.getValue();
-//
-//            emitter.emit(newVar.getName() + " = " + literal + ";\n");
-//            advanceToken();
-//            EOS();
 
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",
