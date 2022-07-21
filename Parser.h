@@ -475,14 +475,14 @@ private:
             if (isVarFloat()) {
                 outSource.insert(0, "float ");
                 identType = FloatLiteral;
-
             } else {
                 outSource.insert(0, "int ");
                 identType = IntLiteral;
-
             }
-            // make and save variable object
+
             identVal = readExpression(); // if this is a float literal, I need to somehow get rid of the fl prefix
+
+            // make and save variable object
             Variable variable(identName, identVal, identType);
             variables.push_back(variable);
 

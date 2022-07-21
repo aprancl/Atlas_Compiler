@@ -50,6 +50,7 @@ enum TokenType {
     FloatLiteral = 7,
     Identifier = 4,
     Comment = 6, // sort of a keyword but it doesn't really do anything
+    Function = 8,
 
 
     //OPERATORS
@@ -71,7 +72,7 @@ enum TokenType {
 // Note to self: I am making token objects and storing them on the heap. are their constructors being
 // called implicitly or am I creating a massive memory leak ?
 class Token {
-private:
+protected:
     // data members
     std::string tokenText;
     TokenType type;
@@ -109,6 +110,7 @@ public:
         typeMap[5] = "Eos";
         typeMap[6] = "Comment";
         typeMap[7] = "FloatLiteral";
+        typeMap[8] = "Function";
         typeMap[201] = "ParenthR";
         typeMap[200] = "ParenthL";
         typeMap[301] = "ClrbraceR";
@@ -139,6 +141,62 @@ public:
         typeMap[105] = "For";
 
         return typeMap[tokenType];
+    }
+
+
+};
+
+class FuncDef : public Token {
+
+    // data members
+    std::string inSource;
+    std::string funcName;
+    TokenType returnType;
+    std::map<std::string, std::string> localVars; // [(name), (value)]
+
+public:
+    //constructors
+    FuncDef() = default;
+
+    FuncDef(std::string inSource, TokenType type) {
+
+        this->inSource = inSource;
+        this->type = type;
+        this->tokenText = "FUNCTION";
+
+    };
+
+    // getters and setters
+
+    std::string getInSource() {
+        return inSource;
+    }
+
+    std::string getFuncName() {
+        return funcName;
+    }
+
+    TokenType getReturnType() {
+        return returnType;
+    }
+
+    const std::map<std::string, std::string> &getLocalVars() const {
+        return localVars;
+    }
+
+    void setFuncName(std::string funcName) {
+        this->funcName = funcName;
+    }
+
+    void setReturnType(TokenType returnType) {
+        this->returnType = returnType;
+    }
+
+
+private:
+    static std::string processFuncHeader(std::string inSource) {
+
+
     }
 
 
@@ -389,10 +447,22 @@ public:
             }
             // else { make token with keyword identifier}
 
-        }
+        } else if (curChar == "#") { // function definition
+            // essentially copy and save the functions declaration and its statements for later
+            std::string function;
+            nextChar();
 
-            // navigational tokens
-        else if (curChar == "\n") {
+            while (curChar != "}" && lookAhead() != ";") {
+                function.append(curChar);
+                nextChar();
+            }
+            nextChar();
+            nextChar();
+
+            token = new FuncDef(function, Function);
+
+        } else if (curChar == "\n") { // navigational tokens
+
             curLineNum++;
             token = new Token(curChar, NewLine);
         } else if (curChar == "\0") {
@@ -433,10 +503,10 @@ public:
 
     }
 
-    void setToLastEq(){
+    void setToLastEq() {
 
-        while (curChar != "="){
-            curPosition --;
+        while (curChar != "=") {
+            curPosition--;
             this->setCurChar(source.substr(curPosition, 1));
         }
 
