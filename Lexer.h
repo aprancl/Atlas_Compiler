@@ -43,6 +43,7 @@ enum TokenType {
     Input = 102,
     While = 104,
     For = 105,
+    Define = 8,
 
     // Objects
     IntLiteral = 2,
@@ -50,7 +51,6 @@ enum TokenType {
     FloatLiteral = 7,
     Identifier = 4,
     Comment = 6, // sort of a keyword but it doesn't really do anything
-    Function = 8,
 
 
     //OPERATORS
@@ -110,7 +110,7 @@ public:
         typeMap[5] = "Eos";
         typeMap[6] = "Comment";
         typeMap[7] = "FloatLiteral";
-        typeMap[8] = "Function";
+        typeMap[8] = "DefineKW";
         typeMap[201] = "ParenthR";
         typeMap[200] = "ParenthL";
         typeMap[301] = "ClrbraceR";
@@ -146,61 +146,61 @@ public:
 
 };
 
-class FuncDef : public Token {
-
-    // data members
-    std::string inSource;
-    std::string funcName;
-    TokenType returnType;
-    std::map<std::string, std::string> localVars; // [(name), (value)]
-
-public:
-    //constructors
-    FuncDef() = default;
-
-    FuncDef(std::string inSource, TokenType type) {
-
-        this->inSource = inSource;
-        this->type = type;
-        this->tokenText = "FUNCTION";
-
-    };
-
-    // getters and setters
-
-    std::string getInSource() {
-        return inSource;
-    }
-
-    std::string getFuncName() {
-        return funcName;
-    }
-
-    TokenType getReturnType() {
-        return returnType;
-    }
-
-    const std::map<std::string, std::string> &getLocalVars() const {
-        return localVars;
-    }
-
-    void setFuncName(std::string funcName) {
-        this->funcName = funcName;
-    }
-
-    void setReturnType(TokenType returnType) {
-        this->returnType = returnType;
-    }
-
-
-private:
-    static std::string processFuncHeader(std::string inSource) {
-
-
-    }
-
-
-};
+//class FuncDef : public Token {
+//
+//    // data members
+//    std::string inSource;
+//    std::string funcName;
+//    TokenType returnType;
+//    std::map<std::string, std::string> localVars; // [(name), (value)]
+//
+//public:
+//    //constructors
+//    FuncDef() = default;
+//
+//    FuncDef(std::string inSource, TokenType type) {
+//
+//        this->inSource = inSource;
+//        this->type = type;
+//        this->tokenText = "FUNCTION";
+//
+//    };
+//
+//    // getters and setters
+//
+//    std::string getInSource() {
+//        return inSource;
+//    }
+//
+//    std::string getFuncName() {
+//        return funcName;
+//    }
+//
+//    TokenType getReturnType() {
+//        return returnType;
+//    }
+//
+//    const std::map<std::string, std::string> &getLocalVars() const {
+//        return localVars;
+//    }
+//
+//    void setFuncName(std::string funcName) {
+//        this->funcName = funcName;
+//    }
+//
+//    void setReturnType(TokenType returnType) {
+//        this->returnType = returnType;
+//    }
+//
+//
+//private:
+//    static std::string processFuncHeader(std::string inSource) {
+//
+//
+//    }
+//
+//
+//};
 
 
 class Lexer { // this is the main portion of the lexer class
@@ -235,7 +235,7 @@ private:
 
 
     int isKeyWord(std::string text) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE"};
 
         for (std::string keyWord: key_words) {
             if (keyWord == text) {
@@ -247,7 +247,7 @@ private:
     }
 
     TokenType getThisKeyword(std::string tokenText) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE"};
 
         if (tokenText == key_words[0]) {
             return Write;
@@ -263,6 +263,8 @@ private:
             return NumKW;
         } else if (tokenText == key_words[6]) {
             return For;
+        } else if (tokenText == key_words[7]) {
+            return Define;
         } else {
             return None; // this shouldn't happen
         }
@@ -445,26 +447,11 @@ public:
             } else {
                 token = new Token(tokenText, Identifier);
             }
-            // else { make token with keyword identifier}
-
-        } else if (curChar == "#") { // function definition
-            // essentially copy and save the functions declaration and its statements for later
-            std::string function;
-            nextChar();
-
-            while (curChar != "}" && lookAhead() != ";") {
-                function.append(curChar);
-                nextChar();
-            }
-            nextChar();
-            nextChar();
-
-            token = new FuncDef(function, Function);
 
         } else if (curChar == "\n") { // navigational tokens
-
             curLineNum++;
             token = new Token(curChar, NewLine);
+
         } else if (curChar == "\0") {
             token = new Token(curChar, Eof);
         } else {
@@ -511,6 +498,19 @@ public:
         }
 
         curChar = std::to_string(source[curPosition]);
+    }
+
+    void setToStartOfName() {
+
+        while (curChar != "E") {
+            curPosition--;
+            this->setCurChar(source.substr(curPosition, 1));
+        }
+
+        this->nextChar();
+
+        curChar + source[curPosition];
+
     }
 
 // getters and setters

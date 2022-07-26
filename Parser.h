@@ -48,6 +48,68 @@ public:
 private:
 
     // helper methods
+
+
+    // function related methods
+
+    std::string readFuncName() {
+        std::cout << "(FUNC)-reading name\n";
+        std::string name;
+        lexer.setToStartOfName();
+
+        while (lexer.getCurChar() != "(") {
+
+            if (!(lexer.getCurChar() == " ")) {
+                name.append(lexer.getCurChar());
+            }
+            lexer.nextChar();
+        }
+        return name;
+
+    }
+
+    std::map<std::string, TokenType> readLocalVars() {
+
+        std::cout << "(FUNC)-reading local vars\n";
+
+        // name, literal type
+        std::map<std::string, TokenType> data;
+
+        lexer.nextChar(); // skip first '('
+        while (lexer.getCurChar() != ")") {
+
+            if (lexer.getCurChar() == " ") {
+                lexer.nextChar();
+                continue; // skip white space
+            }
+
+            // scan var name
+            std::string varName;
+            while (lexer.getCurChar() != ":") { // need to set so i have to close it with a comma or error
+                varName.append(lexer.getCurChar());
+                lexer.nextChar();
+            }
+            lexer.nextChar();
+
+            // scan var token type
+            std::string literalType;
+            while (lexer.getCurChar() != ",") { // need to set so i have to close it with a comma or error
+                literalType.append(lexer.getCurChar());
+                lexer.nextChar();
+            }
+            lexer.nextChar();
+
+            // write scanned data
+            data[varName] = (literalType == "NUM") ? IntLiteral : StringLiteral;
+
+
+        }
+
+        return data;
+
+    }
+
+
     Variable findVarByName(std::string name) {
 
         for (int i = 0; i < variables.size(); ++i) {
@@ -659,6 +721,12 @@ private:
             }
             emitter.emit(";\n");
             EOS();
+
+        } else if (compareToCurToken(Define)) {
+            std::cout << "(FUNC DEF)-Defining a function\n"; // header
+
+            std::string funcName = readFuncName();
+            std::map<std::string, TokenType> localVars = readLocalVars();
 
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",

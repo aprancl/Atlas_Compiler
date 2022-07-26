@@ -1,7 +1,4 @@
-CC integers
 
-NUM pi = fl3.14;
-pi = fl3.999;
-NUM q = fl5.23;
-NUM y = fl1.23;
-q = y;
+DEFINE add (a:NUM, b:NUM,) $ NUM {
+
+};
