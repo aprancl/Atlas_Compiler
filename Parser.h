@@ -68,12 +68,12 @@ private:
 
     }
 
-    std::map<std::string, TokenType> readLocalVars() {
+    std::map<std::string, std::string> readLocalVars() {
 
         std::cout << "(FUNC)-reading local vars\n";
 
         // name, literal type
-        std::map<std::string, TokenType> data;
+        std::map<std::string, std::string> data;
 
         lexer.nextChar(); // skip first '('
         while (lexer.getCurChar() != ")") {
@@ -100,12 +100,41 @@ private:
             lexer.nextChar();
 
             // write scanned data
-            data[varName] = (literalType == "NUM") ? IntLiteral : StringLiteral;
+            data[varName] = (literalType == "NUM") ? "float" : "char*";
 
 
         }
 
         return data;
+
+    }
+
+
+    std::string readReturnType() {
+
+        std::cout << "(FUNC)-reading return type\n";
+        std::string returnType;
+        // skip to dollar sign
+        while (lexer.getCurChar() != "$") {
+            lexer.nextChar();
+        }
+        lexer.nextChar();
+
+        // read string and save to var
+        while (lexer.getCurChar() != "{"){
+
+            if (lexer.getCurChar() == " "){
+                lexer.nextChar();
+                continue;
+            }
+
+            returnType.append(lexer.getCurChar());
+            lexer.nextChar();
+
+        }
+
+        return (returnType == "NUM") ? "float" : (returnType == "STRING") ? "char*" : "void";
+
 
     }
 
@@ -726,7 +755,35 @@ private:
             std::cout << "(FUNC DEF)-Defining a function\n"; // header
 
             std::string funcName = readFuncName();
-            std::map<std::string, TokenType> localVars = readLocalVars();
+            std::map<std::string, std::string> localVars = readLocalVars();
+            std::string returnType = readReturnType();
+
+            // emit the function header
+            emitter.emit(returnType + " " + funcName + "(");
+
+            std::map<std::string, std::string>::iterator it;
+            for (it = localVars.begin(); it != localVars.end(); it++){
+                emitter.emit(it->second + " " + it->first);
+
+                if (std::next(it) != localVars.end()){
+                    emitter.emit(",");
+                }
+            }
+
+            emitter.emit(") {\n");
+
+
+
+            advanceToken();
+            advanceToken();
+            match(CrlbraceL);
+
+            while (!compareToCurToken(CrlbraceR)){
+                statement(); // solution. Make an optimizer !
+            }
+            emitter.emit("}");
+            EOCB();
+
 
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",

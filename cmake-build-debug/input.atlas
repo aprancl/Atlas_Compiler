@@ -1,4 +1,4 @@
 
 DEFINE add (a:NUM, b:NUM,) $ NUM {
-
+    WRITE "Hello world";
 };

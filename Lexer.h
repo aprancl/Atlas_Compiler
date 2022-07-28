@@ -64,7 +64,11 @@ enum TokenType {
     EqEq = 17,
     NotEq = 18,
     GtEq = 19,
-    LtEq = 20
+    LtEq = 20,
+
+    // C related lexing
+    CreturnType = 999,
+    cFuncName = 1000
 
 
 };
@@ -139,68 +143,14 @@ public:
         typeMap[103] = "Cc";
         typeMap[104] = "While";
         typeMap[105] = "For";
+        typeMap[999] = "CreturnType";
+        typeMap[1000] = "CfuncName";
 
         return typeMap[tokenType];
     }
 
 
 };
-
-//class FuncDef : public Token {
-//
-//    // data members
-//    std::string inSource;
-//    std::string funcName;
-//    TokenType returnType;
-//    std::map<std::string, std::string> localVars; // [(name), (value)]
-//
-//public:
-//    //constructors
-//    FuncDef() = default;
-//
-//    FuncDef(std::string inSource, TokenType type) {
-//
-//        this->inSource = inSource;
-//        this->type = type;
-//        this->tokenText = "FUNCTION";
-//
-//    };
-//
-//    // getters and setters
-//
-//    std::string getInSource() {
-//        return inSource;
-//    }
-//
-//    std::string getFuncName() {
-//        return funcName;
-//    }
-//
-//    TokenType getReturnType() {
-//        return returnType;
-//    }
-//
-//    const std::map<std::string, std::string> &getLocalVars() const {
-//        return localVars;
-//    }
-//
-//    void setFuncName(std::string funcName) {
-//        this->funcName = funcName;
-//    }
-//
-//    void setReturnType(TokenType returnType) {
-//        this->returnType = returnType;
-//    }
-//
-//
-//private:
-//    static std::string processFuncHeader(std::string inSource) {
-//
-//
-//    }
-//
-//
-//};
 
 
 class Lexer { // this is the main portion of the lexer class
@@ -233,6 +183,16 @@ private:
         return 1;
     }
 
+    int isCreturnType(std::string text) {
+        std::string cReturnTypes[] = {"int", "float", "char*", "void"};
+
+        for (std::string type: cReturnTypes) {
+            if (text == type) {
+                return 1;
+            }
+        }
+        return 0;
+    }
 
     int isKeyWord(std::string text) {
         std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE"};
@@ -280,8 +240,7 @@ public:
         curLineNum = 1;
     }
 
-    Lexer(std::string
-          source) {
+    Lexer(std::string source) {
         this->source = source + "\n";
         curChar = "";
         curPosition = -1;
@@ -444,8 +403,12 @@ public:
 
                 TokenType type = getThisKeyword(tokenText);
                 token = new Token(tokenText, type);
+
+            } else if (isCreturnType(tokenText)) {
+                token = new Token(tokenText, CreturnType);
             } else {
                 token = new Token(tokenText, Identifier);
+
             }
 
         } else if (curChar == "\n") { // navigational tokens
