@@ -1,4 +1,11 @@
 
-DEFINE add (a:NUM, b:NUM,) $ NUM {
-    WRITE "Hello world";
+CC Simple counting program
+
+WRITE "Enter a number!";
+INPUT NUM x;
+
+NUM a = 1;
+FOR [x] {
+    WRITE a;
+    a = a + 1;
 };

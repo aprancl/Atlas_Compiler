@@ -64,11 +64,7 @@ enum TokenType {
     EqEq = 17,
     NotEq = 18,
     GtEq = 19,
-    LtEq = 20,
-
-    // C related lexing
-    CreturnType = 999,
-    cFuncName = 1000
+    LtEq = 20
 
 
 };
@@ -143,8 +139,6 @@ public:
         typeMap[103] = "Cc";
         typeMap[104] = "While";
         typeMap[105] = "For";
-        typeMap[999] = "CreturnType";
-        typeMap[1000] = "CfuncName";
 
         return typeMap[tokenType];
     }
@@ -183,16 +177,6 @@ private:
         return 1;
     }
 
-    int isCreturnType(std::string text) {
-        std::string cReturnTypes[] = {"int", "float", "char*", "void"};
-
-        for (std::string type: cReturnTypes) {
-            if (text == type) {
-                return 1;
-            }
-        }
-        return 0;
-    }
 
     int isKeyWord(std::string text) {
         std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE"};
@@ -404,8 +388,6 @@ public:
                 TokenType type = getThisKeyword(tokenText);
                 token = new Token(tokenText, type);
 
-            } else if (isCreturnType(tokenText)) {
-                token = new Token(tokenText, CreturnType);
             } else {
                 token = new Token(tokenText, Identifier);
 

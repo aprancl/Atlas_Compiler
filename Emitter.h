@@ -12,7 +12,10 @@
 #include "Lexer.h"
 
 
+
 class Emitter {
+
+private:
 
     // data members
     std::string fullPath;
@@ -21,7 +24,7 @@ class Emitter {
     std::string funcMainHeader = "int main() {\n";
     std::string header; //used for variable declarations
     std::string outSource;
-//    std::string setUp = "#include <stdio.h>\nint main() {\n";
+
 
 public:
 
@@ -31,6 +34,7 @@ public:
         this->fullPath = fullPath;
         header = "";
         outSource = "";
+
     }
 
     void emit(std::string outSource) {
@@ -54,52 +58,10 @@ public:
     }
 
     // other methods
-    void optimize(std::string source) {
-
-        source.insert(0," ");
-        Lexer lexer(source);
-
-        int cpyStartPos;
-        int cpyEndPos;
-        Token lastToken;
-        Token curToken = lexer.getToken();
-        while (curToken.getType() != Eof) {
-            cpyStartPos = lexer.getCurPosition();
-
-            if (curToken.getType() == Space){
-                curToken = lexer.getToken();
-                continue;
-            } else if (curToken.getType() == CreturnType ){
-                curToken = lexer.getToken();
-
-                if (curToken.getType() == Space) {
-                    curToken = lexer.getToken();
-                } else if (curToken.getType() == Identifier && lexer.lookAhead() == "(") {
-                    while (lexer.getCurChar() != "}"){
-                        lexer.nextChar();
-                    }
-                    cpyEndPos = lexer.getCurPosition();
-
-                    // copy and delete the section of code
-                    emitToUserFuncDefs(source.substr(cpyStartPos, cpyEndPos - cpyStartPos));
-
-
-                }
-            } else {
-                curToken = lexer.getToken();
-                continue;
-            }
-
-        }
-
-
-    }
 
     void writeFile() {
         std::ofstream myOutFile;
         myOutFile.open(fullPath);
-
-        optimize(outSource);
 
         if (myOutFile.is_open()) {
             myOutFile << includeStatements + userFuncDefs + funcMainHeader + "\n" + header + "\n" + outSource;
