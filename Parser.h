@@ -121,9 +121,9 @@ private:
         lexer.nextChar();
 
         // read string and save to var
-        while (lexer.getCurChar() != "{"){
+        while (lexer.getCurChar() != "{") {
 
-            if (lexer.getCurChar() == " "){
+            if (lexer.getCurChar() == " ") {
                 lexer.nextChar();
                 continue;
             }
@@ -350,21 +350,29 @@ private:
 
 // parsing through expressions
 
-    void primary() {
+    void primary(bool isFuncStatement) {
 
 
         printf("PRIMARY [%s -> %s]\n", Token::typeToString(curToken.getType()).c_str(),
                curToken.getTokenText().c_str());
 
         if (compareToCurToken(IntLiteral) || compareToCurToken(FloatLiteral)) {
-            emitter.emit(curToken.getTokenText());
+            if (!isFuncStatement) {
+                emitter.emit(curToken.getTokenText());
+            } else {
+                emitter.emitToUserFuncDefs(curToken.getTokenText());
+            }
             advanceToken();
             return;
 
         } else if (compareToCurToken(Identifier)) {
 
             if (isUsedIdentifier(curToken.getTokenText())) {
-                emitter.emit(curToken.getTokenText());
+                if (!isFuncStatement) {
+                    emitter.emit(curToken.getTokenText());
+                } else {
+                    emitter.emitToUserFuncDefs(curToken.getTokenText());
+                }
                 advanceToken();
                 return;
             } else {
@@ -392,67 +400,88 @@ private:
 
     }
 
-    void unary() {
+    void unary(bool isFuncStatement) {
         std::cout << "UNARY\n";
 
         if (compareToCurToken(Plus) || compareToCurToken(Minus)) {
-            emitter.emit(" " + curToken.getTokenText() + " ");
+            if (!isFuncStatement) {
+                emitter.emit(" " + curToken.getTokenText() + " ");
+            } else {
+                emitter.emitToUserFuncDefs(" " + curToken.getTokenText() + " ");
+            }
             advanceToken();
         }
-        primary();
+        primary(isFuncStatement);
     }
 
-    void term() {
+    void term(bool isFuncStatement) {
         std::cout << "TERM\n";
-        unary();
+        unary(isFuncStatement);
 
         // there can be 0 or more mult OR div sub expressions
         while (compareToCurToken(Asterisk) || compareToCurToken(Fslash)) {
-            emitter.emit(" " + curToken.getTokenText() + " ");
+            if (!isFuncStatement) {
+                emitter.emit(" " + curToken.getTokenText() + " ");
+            } else {
+                emitter.emitToUserFuncDefs(" " + curToken.getTokenText() + " ");
+            }
             advanceToken();
-            unary();
+            unary(isFuncStatement);
         }
     }
 
 
-    void expression() {
+    void expression(bool isFuncSatement) {
 
         std::cout << "..EXPRESSION\n";
 
-        term();
+        term(isFuncSatement);
 
         // there are 0 or more + OR - expression
         while (compareToCurToken(Plus) || compareToCurToken(Minus)) {
-            emitter.emit(" " + curToken.getTokenText() + " ");
+            if (!isFuncSatement) {
+                emitter.emit(" " + curToken.getTokenText() + " ");
+            } else {
+                emitter.emitToUserFuncDefs(" " + curToken.getTokenText() + " ");
+            }
             advanceToken();
-            term();
+            term(isFuncSatement);
         }
 
     }
 
-    void comparison() {
+    void comparison(bool isFuncStatement) {
         std::cout << "=COMPARISON=\n";
 
-        expression();
+        expression(isFuncStatement);
 
         if (isComparisonOperator(curToken)) {
-            emitter.emit(" " + curToken.getTokenText() + " ");
+            if (!isFuncStatement) {
+                emitter.emit(" " + curToken.getTokenText() + " ");
+            } else {
+                emitter.emitToUserFuncDefs(" " + curToken.getTokenText() + " ");
+            }
             advanceToken();
-            expression();
+            expression(isFuncStatement);
         } else {
             printf(ANSI_COLOR_CYAN "Parsing error..found incomplete boolean expression, at...\n%s <-*\n",
                    lexer.getSource().substr(0, lexer.getCurPosition()).c_str());
         }
 
         while (isComparisonOperator(curToken)) {
-            emitter.emit(curToken.getTokenText());
+            if (!isFuncStatement) {
+                emitter.emit(curToken.getTokenText());
+            } else {
+                emitter.emitToUserFuncDefs(curToken.getTokenText());
+            }
             advanceToken();
-            expression();
+            expression(isFuncStatement);
         }
     }
 
 // statement ::= "WRITE" (expression || TK.StringLiteral) TK.Eos || etc...
-    void statement() { // this is the meat of the parser
+    void statement(bool isFuncStatement) { // this is the meat of the parser
+        // the boolean var input is used to determine where to emit the code. different instances of statement parsing will have different destinations in the output file
 
         // for print (STATEMENT)
         if (compareToCurToken(Write)) { // print statement
@@ -461,16 +490,32 @@ private:
 
             // search for string literal, identifier, or  expression
             if (compareToCurToken(StringLiteral)) {
-                emitter.emitLine((std::string) ("printf(\"") + curToken.getTokenText() + "\\n\");");
+
+                if (!isFuncStatement) {
+                    emitter.emitLine((std::string) ("printf(\"") + curToken.getTokenText() + "\\n\");");
+                } else {
+                    emitter.emitToUserFuncDefs((std::string) ("printf(\"") + curToken.getTokenText() + "\\n\");\n");
+                }
                 advanceToken();
             } else if (compareToCurToken(Identifier) && findIdentType(curToken) == StringLiteral) {
-                emitter.emitLine((std::string) ("printf(\"%s\\n\",") + curToken.getTokenText() + ");");
+                if (!isFuncStatement) {
+                    emitter.emitLine((std::string) ("printf(\"%s\\n\",") + curToken.getTokenText() + ");");
+                } else {
+                    emitter.emitToUserFuncDefs((std::string) ("printf(\"%s\\n\",") + curToken.getTokenText() + ");\n");
+                }
                 advanceToken();
             } else if (compareToCurToken(Identifier) || compareToCurToken(IntLiteral) ||
                        compareToCurToken(FloatLiteral)) {
-                emitter.emit((std::string) ("printf(\"%") + ".2f\\n\", (float)(");
-                expression();
-                emitter.emitLine("));");
+
+                if (!isFuncStatement) {
+                    emitter.emit((std::string) ("printf(\"%") + ".2f\\n\", (float)(");
+                    expression(isFuncStatement);
+                    emitter.emitLine("));");
+                } else {
+                    emitter.emitToUserFuncDefs((std::string) ("printf(\"%") + ".2f\\n\", (float)(");
+                    expression(isFuncStatement);
+                    emitter.emitToUserFuncDefs("));\n");
+                }
             } else {
                 printf(ANSI_COLOR_CYAN "\nParsing error..only literals of type <STRING, INT, FLOAT> will print\n");
                 exit(35);
@@ -535,7 +580,11 @@ private:
 
             EOS();
             outSource.append(";\n");
-            emitter.emit(outSource);
+            if (!isFuncStatement) {
+                emitter.emit(outSource);
+            } else {
+                emitter.emitToUserFuncDefs(outSource);
+            }
 
 
         } else if (compareToCurToken(NumKW)) { // variable assignment of type int and float
@@ -577,53 +626,91 @@ private:
             Variable variable(identName, identVal, identType);
             variables.push_back(variable);
 
+            if (!isFuncStatement) {
+                emitter.emit(outSource);
+                expression(isFuncStatement);
+                emitter.emit(";\n");
+            } else {
+                emitter.emitToUserFuncDefs(outSource);
+                expression(isFuncStatement);
+                emitter.emitToUserFuncDefs(";\n");
+            }
 
-            emitter.emit(outSource);
-            expression();
-            emitter.emit(";\n");
-
-//            advanceToken();
             EOS();
 
         } else if (compareToCurToken(Comment)) { // comments
             std::cout << "COMMENT\n";
-            emitter.emitLine("// " + curToken.getTokenText()); // prints to c.out without spaces - ruins readability
+
+            if (!isFuncStatement) {
+                emitter.emitLine("// " + curToken.getTokenText()); // prints to c.out without spaces - ruins readability
+            } else {
+                emitter.emitToUserFuncDefs(
+                        "// " + curToken.getTokenText() + "\n"); // prints to c.out without spaces - ruins readability
+            }
             advanceToken();
 
 
         } else if (compareToCurToken(If)) { // if statements
             std::cout << "(STATEMENT)-IF_CONDITION\n";
-            emitter.emit("if (");
+
+            if (!isFuncStatement) {
+                emitter.emit("if (");
+            } else {
+                emitter.emitToUserFuncDefs("if (");
+            }
             advanceToken();
 
             match(SqrbraceL);
-            comparison();
+            comparison(isFuncStatement);
             match(SqrbraceR);
             match(CrlbraceL);
-            emitter.emit(")\n{\n");
+            if (!isFuncStatement) {
+                emitter.emit(")\n{\n");
+            } else {
+                emitter.emitToUserFuncDefs(")\n{\n");
+            }
 
             // execute all statements in the code block
             while (!compareToCurToken(CrlbraceR)) { // this kind of hurts my brain, but it works
-                statement();
+                statement(isFuncStatement);
             }
             EOCB();
-            emitter.emit("\n}\n");
+
+            if (!isFuncStatement) {
+                emitter.emit("\n}\n");
+            } else {
+                emitter.emitToUserFuncDefs("\n}\n");
+            }
 
         } else if (compareToCurToken(While)) { // while loops
             std::cout << "(STATEMENT)-WHILE_LOOP\n";
-            emitter.emit("while (");
+
+            if (!isFuncStatement) {
+                emitter.emit("while (");
+            } else {
+                emitter.emitToUserFuncDefs("while (");
+            }
             advanceToken();
 
             match(SqrbraceL);
-            comparison();
+            comparison(isFuncStatement);
             match(SqrbraceR);
             match(CrlbraceL);
-            emitter.emit(")\n{\n");
+            if (!isFuncStatement) {
+                emitter.emit(")\n{\n");
+            } else {
+                emitter.emitToUserFuncDefs(")\n{\n");
+            }
             // execute all statements in the code block
             while (!compareToCurToken(CrlbraceR)) {
-                statement();
+                statement(isFuncStatement);
             }
-            emitter.emit("\n}\n");
+
+            if (!isFuncStatement) {
+                emitter.emit("\n}\n");
+            } else {
+                emitter.emitToUserFuncDefs("\n}\n");
+            }
             EOCB();
 
         } else if (compareToCurToken(For)) { // for loops
@@ -632,13 +719,23 @@ private:
             advanceToken();
 
             match(SqrbraceL);
-            emitter.emit("for ( ");
+
+            if (!isFuncStatement) {
+                emitter.emit("for ( ");
+            } else {
+                emitter.emitToUserFuncDefs("for ( ");
+            }
 
             if (compareToCurToken(IntLiteral) || (compareToCurToken(Identifier) &&
                                                   (findIdentType(curToken) == IntLiteral ||
                                                    findIdentType(curToken) == FloatLiteral))) {
                 std::cout << "..NUM_ || FLOAT_\n";
-                emitter.emit("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
+
+                if (!isFuncStatement) {
+                    emitter.emit("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
+                } else {
+                    emitter.emitToUserFuncDefs("int i = 0; i < " + curToken.getTokenText() + "; ++i)\n{\n");
+                }
                 advanceToken();
 
             } else if (compareToCurToken(StringLiteral) ||
@@ -649,7 +746,12 @@ private:
                                                                              curToken.getTokenText() + "\"); ++i)\n{\n"
                                                                            : "int i = 0; i < sizeof(" +
                                                                              curToken.getTokenText() + "); ++i)\n{\n";
-                emitter.emit(outSource);
+
+                if (!isFuncStatement) {
+                    emitter.emit(outSource);
+                } else {
+                    emitter.emitToUserFuncDefs(outSource);
+                }
                 advanceToken();
 
             }
@@ -658,10 +760,15 @@ private:
             match(CrlbraceL);
             // execute all statements in the code block
             while (!compareToCurToken(CrlbraceR)) {
-                statement();
+                statement(isFuncStatement);
             }
             EOCB();
-            emitter.emit("\n}\n");
+
+            if (!isFuncStatement) {
+                emitter.emit("\n}\n");
+            } else {
+                emitter.emitToUserFuncDefs("\n}\n");
+            }
 
 
         } else if (compareToCurToken(Input)) { // input statements
@@ -675,10 +782,21 @@ private:
 
                 // declare the string in the c.out header
                 std::string varName = nextToken.getTokenText();
-                emitter.emitHeader("char *" + varName + " = malloc(sizeof(" + varName + "));\n");
 
-                // emit info
-                emitter.emit("scanf(\"%s\", " + varName + ");\n");
+                if (!isFuncStatement) {
+
+                    emitter.emitHeader("char *" + varName + " = malloc(sizeof(" + varName + "));\n");
+
+                    // emit info
+                    emitter.emit("scanf(\"%s\", " + varName + ");\n");
+                } else {
+
+                    emitter.emitToUserFuncDefs("char *" + varName + " = malloc(sizeof(" + varName + "));\n");
+
+                    // emit info
+                    emitter.emitToUserFuncDefs("scanf(\"%s\", " + varName + ");\n");
+                }
+
 
                 // make variable
                 Variable variable(varName, varName, StringLiteral);
@@ -689,10 +807,21 @@ private:
 
                 // declare the string in the c.out header
                 std::string varName = nextToken.getTokenText();
-                emitter.emitHeader("float " + varName + ";\n");
 
-                // emit info
-                emitter.emit("scanf(\"%f\", &" + varName + ");\n");
+                if (!isFuncStatement) {
+
+                    emitter.emitHeader("float " + varName + ";\n");
+
+                    // emit info
+                    emitter.emit("scanf(\"%f\", &" + varName + ");\n");
+                } else {
+
+                    emitter.emitToUserFuncDefs("float " + varName + ";\n");
+
+                    // emit info
+                    emitter.emitToUserFuncDefs("scanf(\"%f\", &" + varName + ");\n");
+                }
+
 
                 // make variable
                 Variable variable(varName, varName, FloatLiteral);
@@ -705,7 +834,12 @@ private:
 
 
             EOS();
-            emitter.emit(outSource);
+
+            if (!isFuncStatement) {
+                emitter.emit(outSource);
+            } else {
+                emitter.emitToUserFuncDefs(outSource);
+            }
 
 
         }
@@ -731,7 +865,12 @@ private:
             // string literal
             if (curToken.getType() == StringLiteral && originVar.getDataType() == StringLiteral) {
                 varPtr->setValue(curToken.getTokenText());
-                emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\\0\"");
+
+                if (!isFuncStatement) {
+                    emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\\0\"");
+                } else {
+                    emitter.emitToUserFuncDefs(originVar.getName() + " = \"" + varPtr->getValue() + "\\0\"");
+                }
                 advanceToken();
             }
                 // string variable
@@ -739,16 +878,31 @@ private:
                      originVar.getDataType() == StringLiteral) {
 
                 varPtr->setPtrVar(findVarByName(curToken.getTokenText()));
-                emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\"");
+
+                if (!isFuncStatement) {
+                    emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\"");
+                } else {
+                    emitter.emitToUserFuncDefs(originVar.getName() + " = \"" + varPtr->getValue() + "\"");
+                }
                 advanceToken();
             } else {
                 varPtr->setValue(readExpression());
-                emitter.emit(originVar.getName() + " = ");
+
+                if  (!isFuncStatement) {
+                    emitter.emit(originVar.getName() + " = ");
+                } else {
+                    emitter.emitToUserFuncDefs(originVar.getName() + " = ");
+                }
                 std::string exprVal = readExpression();
 
-                expression();
+                expression(isFuncStatement);
             }
-            emitter.emit(";\n");
+
+            if (!isFuncStatement) {
+                emitter.emit(";\n");
+            } else {
+                emitter.emitToUserFuncDefs(";\n");
+            }
             EOS();
 
         } else if (compareToCurToken(Define)) {
@@ -759,29 +913,29 @@ private:
             std::string returnType = readReturnType();
 
             // emit the function header
-            emitter.emit(returnType + " " + funcName + "(");
+            std::string outSource;
+            outSource.append(returnType + " " + funcName + "(");
 
             std::map<std::string, std::string>::iterator it;
-            for (it = localVars.begin(); it != localVars.end(); it++){
-                emitter.emit(it->second + " " + it->first);
+            for (it = localVars.begin(); it != localVars.end(); it++) {
+                outSource.append(it->second + " " + it->first);
 
-                if (std::next(it) != localVars.end()){
-                    emitter.emit(",");
+                if (std::next(it) != localVars.end()) {
+                    outSource.append(",");
                 }
             }
 
-            emitter.emit(") {\n");
-
-
+            outSource.append(") {\n");
+            emitter.emitToUserFuncDefs(outSource);
 
             advanceToken();
             advanceToken();
             match(CrlbraceL);
 
-            while (!compareToCurToken(CrlbraceR)){
-                statement(); // solution. Make an optimizer !
+            while (!compareToCurToken(CrlbraceR)) {
+                statement(true); // solution. Make an optimizer !
             }
-            emitter.emit("}");
+            emitter.emitToUserFuncDefs("}\n");
             EOCB();
 
 
@@ -804,7 +958,7 @@ public:
 
         // parse through all given statements
         while (!(compareToCurToken(Eof))) {
-            statement();
+            statement(false);
         }
 
         emitter.emitLine("\nreturn 0;");

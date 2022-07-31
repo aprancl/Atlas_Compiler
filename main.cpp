@@ -49,7 +49,6 @@ int main() {
 
     // start the program
     parser.program();
-    // emitter.writeFile();
 
     return 0;
 }
