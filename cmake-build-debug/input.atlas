@@ -1,3 +1,6 @@
-DEFINE add(a:NUM, b:NUM,) $ NONE {
+
+DEFINE sayHi() $ NONE {
     WRITE "Hello, world!";
 };
+
+@sayHi();

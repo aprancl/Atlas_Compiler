@@ -888,7 +888,7 @@ private:
             } else {
                 varPtr->setValue(readExpression());
 
-                if  (!isFuncStatement) {
+                if (!isFuncStatement) {
                     emitter.emit(originVar.getName() + " = ");
                 } else {
                     emitter.emitToUserFuncDefs(originVar.getName() + " = ");
@@ -905,7 +905,7 @@ private:
             }
             EOS();
 
-        } else if (compareToCurToken(Define)) {
+        } else if (compareToCurToken(Define)) { // defining functions
             std::cout << "(FUNC DEF)-Defining a function\n"; // header
 
             std::string funcName = readFuncName();
@@ -937,6 +937,47 @@ private:
             }
             emitter.emitToUserFuncDefs("}\n");
             EOCB();
+
+
+        } else if (compareToCurToken(At)) { // function call
+            std::cout << "(CALL-FUNC)\n";
+            advanceToken();
+
+            match(Identifier);
+            std::string funcName = lastToken.getTokenText();
+
+            match(ParenthL);
+
+            // read the given variables
+            if (compareToCurToken(ParenthR)){
+                advanceToken();
+
+                if (!isFuncStatement) {
+                    emitter.emit(funcName + "(" + ");\n");
+                } else {
+                    emitter.emitToUserFuncDefs(funcName + "(" + ");\n");
+                }
+                EOS();
+                return;
+            }
+            std::string vars;
+            while (curToken.getType() != Comma || nextToken.getType() != ParenthR) {
+
+                std::string literal = (curToken.getType() == StringLiteral) ? "\"" + curToken.getTokenText() + "\""
+                                                                            : curToken.getTokenText();
+
+                vars.append(literal);
+                advanceToken();
+            }
+            advanceToken();
+            advanceToken();
+
+            if (!isFuncStatement) {
+                emitter.emit(funcName + "(" + vars + ");\n");
+            } else {
+                emitter.emitToUserFuncDefs(funcName + "(" + vars + ");\n");
+            }
+            EOS();
 
 
         } else {

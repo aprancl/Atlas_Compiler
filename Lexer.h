@@ -29,6 +29,8 @@ enum TokenType {
     SqrbraceR = 401, // ]
     SqrbraceL = 400, // [
     Bslash = 199,
+    At = 198,
+    Comma = 197,
 
 
     // DATA TYPES
@@ -69,8 +71,6 @@ enum TokenType {
 
 };
 
-// Note to self: I am making token objects and storing them on the heap. are their constructors being
-// called implicitly or am I creating a massive memory leak ?
 class Token {
 protected:
     // data members
@@ -132,6 +132,8 @@ public:
         typeMap[50] = "FloKW";
         typeMap[75] = "StringKW";
         typeMap[99] = "Keyword";
+        typeMap[197] = "Comma";
+        typeMap[198] = "At";
         typeMap[199] = "Bslash";
         typeMap[100] = "Write";
         typeMap[101] = "If";
@@ -266,6 +268,10 @@ public:
             token = new Token(curChar, CrlbraceL);
         } else if (curChar == "}") { // left curly bracket
             token = new Token(curChar, CrlbraceR);
+        } else if (curChar == "@") {
+            token = new Token(curChar, At);
+        } else if (curChar == ",") {
+            token = new Token(curChar, Comma);
         }
             // length 2 tokens (mostly boolean comparison operators)
         else if (curChar == "=") { // equals and equal-equals
