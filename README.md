@@ -1,5 +1,14 @@
 # Atlas_Compiler
 
-Converts custom atlas language to c.
+## Description
+The Atlas Compiler is an independent project, and is aimed primarily at cultivating a deeper understanding of how great languages like C, C++, Java, etc are used to run technology in the modern age    
 
-consists of lexer, parser, and code emitter 
+## Structure 
+#### Consists of:
+- Lexer (Tokenizer)
+- Parser
+- Code Emitter
+- "Helper" classes
+  - Variable.h
+  - optimizer? (Future)
+## Grammar

@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 void sayHi() {
-printf("Hello, world!\n");
+    printf("Hello, world!\n");
 }
+
 int main() {
 
 
-sayHi();
+    sayHi();
 
-return 0;
+    return 0;
 }
