@@ -1,6 +1,8 @@
 
-DEFINE sayHi() $ NONE {
-    WRITE "Hello, world!";
+DEFINE makeName() $ STRING {
+    STRING data = "Anthony";
+    RETURN data;
 };
 
-@sayHi();
+
+@makeName();

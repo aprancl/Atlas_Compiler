@@ -949,7 +949,7 @@ private:
             match(ParenthL);
 
             // read the given variables
-            if (compareToCurToken(ParenthR)){
+            if (compareToCurToken(ParenthR)) {
                 advanceToken();
 
                 if (!isFuncStatement) {
@@ -979,6 +979,33 @@ private:
             }
             EOS();
 
+
+        } else if (compareToCurToken(Return)) {
+            std::cout << "(FUNC)-RETURN STATEMENT\n";
+            advanceToken();
+
+            if (!isFuncStatement) {
+                emitter.emit("return ");
+            } else {
+                emitter.emitToUserFuncDefs("return ");
+            }
+
+            if (curToken.getType() == StringLiteral ||
+                compareToCurToken(Identifier) && findIdentType(curToken) == StringLiteral) {
+
+                // something is wrong with my thought process
+                std::string outSource = (curToken.getType() == StringLiteral) ? "\"" + curToken.getTokenText() + "\""
+                                                                              : curToken.getTokenText();
+                if (!isFuncStatement) {
+                    emitter.emit(outSource);
+                } else {
+                    emitter.emitToUserFuncDefs(outSource);
+                }
+            } else {
+                expression(isFuncStatement);
+            }
+
+            EOS();
 
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",

@@ -46,6 +46,7 @@ enum TokenType {
     While = 104,
     For = 105,
     Define = 8,
+    Return = 9,
 
     // Objects
     IntLiteral = 2,
@@ -111,6 +112,7 @@ public:
         typeMap[6] = "Comment";
         typeMap[7] = "FloatLiteral";
         typeMap[8] = "DefineKW";
+        typeMap[9] = "Return";
         typeMap[201] = "ParenthR";
         typeMap[200] = "ParenthL";
         typeMap[301] = "ClrbraceR";
@@ -181,7 +183,7 @@ private:
 
 
     int isKeyWord(std::string text) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE", "RETURN"};
 
         for (std::string keyWord: key_words) {
             if (keyWord == text) {
@@ -193,7 +195,7 @@ private:
     }
 
     TokenType getThisKeyword(std::string tokenText) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE", "RETURN"};
 
         if (tokenText == key_words[0]) {
             return Write;
@@ -211,6 +213,8 @@ private:
             return For;
         } else if (tokenText == key_words[7]) {
             return Define;
+        } else if (tokenText == key_words[8]) {
+            return Return;
         } else {
             return None; // this shouldn't happen
         }
