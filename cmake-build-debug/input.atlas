@@ -1,8 +1,8 @@
 
-DEFINE makeName() $ STRING {
-    STRING data = "Anthony";
-    RETURN data;
+DEFINE doMath(x:NUM, y:NUM,) $ NUM {
+    NUM answer = x + y;
+    RETURN answer;
 };
 
 
-@makeName();
+@doMath(1,2);

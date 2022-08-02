@@ -249,7 +249,8 @@ private:
             }
 
         } else {
-            printf(ANSI_COLOR_CYAN"\nParsing error..variable referenced before definition\n");
+            printf(ANSI_COLOR_CYAN"\nParsing error..variable <%s> referenced before definition\n",
+                   identifier.getTokenText().c_str());
             exit(35);
         }
 
@@ -367,6 +368,7 @@ private:
 
         } else if (compareToCurToken(Identifier)) {
 
+            // nvm this is the line that is messing me up
             if (isUsedIdentifier(curToken.getTokenText())) {
                 if (!isFuncStatement) {
                     emitter.emit(curToken.getTokenText());
@@ -620,6 +622,7 @@ private:
                 identType = IntLiteral;
             }
 
+            // this is the line that stops the function doMath()
             identVal = readExpression(); // if this is a float literal, I need to somehow get rid of the fl prefix
 
             // make and save variable object
@@ -1004,8 +1007,14 @@ private:
             } else {
                 expression(isFuncStatement);
             }
-
+            advanceToken();
             EOS();
+
+            if (!isFuncStatement) {
+                emitter.emit(";\n");
+            } else {
+                emitter.emitToUserFuncDefs(";\n");
+            }
 
         } else {
             printf(ANSI_COLOR_CYAN "\nParsing error..invalid statement on line: %d ...\n%s<-*",

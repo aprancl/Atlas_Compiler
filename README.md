@@ -11,4 +11,4 @@ The Atlas Compiler is an independent project, and is aimed primarily at cultivat
 - "Helper" classes
   - Variable.h
   - optimizer? (Future)
-## Grammar
+## Syntax

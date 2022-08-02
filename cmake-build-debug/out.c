@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void sayHi() {
-    printf("Hello, world!\n");
+char *makeName() {
+    char *data = "Anthony\0";
+    return data;
 }
 
 int main() {
 
 
-    sayHi();
+    makeName();
 
     return 0;
 }

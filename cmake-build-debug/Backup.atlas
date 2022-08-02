@@ -112,3 +112,12 @@ NUM thing = 8*8;
 expr = thing + 7;
 expr = expr + 100;
 NUM expr2 = 10 * expr;
+
+
+CC First Working Function!
+
+DEFINE makeName() $ STRING {
+    STRING data = "Anthony";
+    RETURN data;
+};
+@makeName();
