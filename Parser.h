@@ -912,18 +912,28 @@ private:
             std::cout << "(FUNC DEF)-Defining a function\n"; // header
 
             std::string funcName = readFuncName();
-            std::map<std::string, std::string> localVars = readLocalVars();
+            std::map<std::string, std::string> localVars = readLocalVars(); // varName, varVal
             std::string returnType = readReturnType();
+
+            // save local vars to memory
+
+            std::map<std::string, std::string>::iterator it1;
+            for (it1 = localVars.begin(); it1 != localVars.end(); it1++) {
+                Variable var(it1->first, "",
+                             (it1->second == "float") ? FloatLiteral : StringLiteral); // name, value, type
+                variables.push_back(var);
+            }
+
 
             // emit the function header
             std::string outSource;
             outSource.append(returnType + " " + funcName + "(");
 
-            std::map<std::string, std::string>::iterator it;
-            for (it = localVars.begin(); it != localVars.end(); it++) {
-                outSource.append(it->second + " " + it->first);
+            std::map<std::string, std::string>::iterator it2;
+            for (it2 = localVars.begin(); it2 != localVars.end(); it2++) {
+                outSource.append(it2->second + " " + it2->first);
 
-                if (std::next(it) != localVars.end()) {
+                if (std::next(it2) != localVars.end()) {
                     outSource.append(",");
                 }
             }
@@ -1004,10 +1014,10 @@ private:
                 } else {
                     emitter.emitToUserFuncDefs(outSource);
                 }
+                advanceToken();
             } else {
                 expression(isFuncStatement);
             }
-            advanceToken();
             EOS();
 
             if (!isFuncStatement) {

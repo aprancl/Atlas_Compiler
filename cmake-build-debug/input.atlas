@@ -4,5 +4,11 @@ DEFINE doMath(x:NUM, y:NUM,) $ NUM {
     RETURN answer;
 };
 
+DEFINE sayHi() $ STRING {
+    STRING msg = "Hello!";
+    RETURN msg;
+};
 
-@doMath(1,2);
+
+@doMath(1,2,);
+@sayHi();

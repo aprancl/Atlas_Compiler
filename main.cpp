@@ -5,8 +5,8 @@
 #include <map>
 #include <fstream>
 
-//TODO dont allow vairable reassingment of an int to float  and float to int <-- causes inaccuracies
-//TODO Fix the way that float literal are saved. instal of "fl3.14" it should just be 3.14
+//TODO (polish) dont allow variable reassignment of an int to float  and float to int <-- causes inaccuracies
+//TODO (polish)Fix the way that float literal are saved. install of "fl3.14" it should just be 3.14
 
 
 // search for the given file name on computer and return its text <- will be saved to source variable in main
