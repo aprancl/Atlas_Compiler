@@ -12,3 +12,5 @@ DEFINE sayHi() $ STRING {
 
 @doMath(1,2,);
 @sayHi();
+
+WRITE @sayHi();

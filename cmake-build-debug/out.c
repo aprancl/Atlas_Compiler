@@ -16,6 +16,7 @@ int main() {
 
     doMath(1, 2);
     sayHi();
+    printf("%s\n", sayHi());
 
     return 0;
 }

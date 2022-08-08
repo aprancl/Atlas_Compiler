@@ -281,6 +281,85 @@ private:
         return (type == this->nextToken.getType());
     }
 
+    void parseFunction(bool isFuncStatement) {
+
+        match(Identifier);
+        std::string funcName = lastToken.getTokenText();
+
+        match(ParenthL);
+
+        // read the given variables
+        if (compareToCurToken(ParenthR)) {
+            advanceToken();
+
+            if (!isFuncStatement) {
+                emitter.emit(funcName + "(" + ");\n");
+            } else {
+                emitter.emitToUserFuncDefs(funcName + "(" + ");\n");
+            }
+            EOS();
+            return;
+        }
+        std::string vars;
+        while (curToken.getType() != Comma || nextToken.getType() != ParenthR) {
+
+            std::string literal = (curToken.getType() == StringLiteral) ? "\"" + curToken.getTokenText() + "\""
+                                                                        : curToken.getTokenText();
+
+            vars.append(literal);
+            advanceToken();
+        }
+        advanceToken();
+        advanceToken();
+
+        if (!isFuncStatement) {
+            emitter.emit(funcName + "(" + vars + ");\n");
+        } else {
+            emitter.emitToUserFuncDefs(funcName + "(" + vars + ");\n");
+        }
+        EOS();
+
+    }
+
+    void parseFunctionBland(bool isFuncStatement){
+
+        match(Identifier);
+        std::string funcName = lastToken.getTokenText();
+
+        match(ParenthL);
+
+        // read the given variables
+        if (compareToCurToken(ParenthR)) {
+            advanceToken();
+
+            if (!isFuncStatement) {
+                emitter.emit(funcName + "(" + ")");
+            } else {
+                emitter.emitToUserFuncDefs(funcName + "(" + ")");
+            }
+            EOS();
+            return;
+        }
+        std::string vars;
+        while (curToken.getType() != Comma || nextToken.getType() != ParenthR) {
+
+            std::string literal = (curToken.getType() == StringLiteral) ? "\"" + curToken.getTokenText() + "\""
+                                                                        : curToken.getTokenText();
+
+            vars.append(literal);
+            advanceToken();
+        }
+        advanceToken();
+        advanceToken();
+
+        if (!isFuncStatement) {
+            emitter.emit(funcName + "(" + vars + ")");
+        } else {
+            emitter.emitToUserFuncDefs(funcName + "(" + vars + ")");
+        }
+        EOS();
+    }
+
 
     void advanceToken() {
 
@@ -518,6 +597,21 @@ private:
                     expression(isFuncStatement);
                     emitter.emitToUserFuncDefs("));\n");
                 }
+            } else if (compareToCurToken(At)) {
+                advanceToken();
+                if (!isFuncStatement){
+                    emitter.emit("printf(\"%s\\n\", ");
+                } else {
+                    emitter.emitToUserFuncDefs( "printf(\"%s\\n\", ");
+                }
+                parseFunctionBland(isFuncStatement);
+
+                if (!isFuncStatement) {
+                    emitter.emit(");\n");
+                } else {
+                    emitter.emitToUserFuncDefs(");\n");
+                }
+                return;
             } else {
                 printf(ANSI_COLOR_CYAN "\nParsing error..only literals of type <STRING, INT, FLOAT> will print\n");
                 exit(35);
@@ -954,44 +1048,9 @@ private:
 
         } else if (compareToCurToken(At)) { // function call
             std::cout << "(CALL-FUNC)\n";
+
             advanceToken();
-
-            match(Identifier);
-            std::string funcName = lastToken.getTokenText();
-
-            match(ParenthL);
-
-            // read the given variables
-            if (compareToCurToken(ParenthR)) {
-                advanceToken();
-
-                if (!isFuncStatement) {
-                    emitter.emit(funcName + "(" + ");\n");
-                } else {
-                    emitter.emitToUserFuncDefs(funcName + "(" + ");\n");
-                }
-                EOS();
-                return;
-            }
-            std::string vars;
-            while (curToken.getType() != Comma || nextToken.getType() != ParenthR) {
-
-                std::string literal = (curToken.getType() == StringLiteral) ? "\"" + curToken.getTokenText() + "\""
-                                                                            : curToken.getTokenText();
-
-                vars.append(literal);
-                advanceToken();
-            }
-            advanceToken();
-            advanceToken();
-
-            if (!isFuncStatement) {
-                emitter.emit(funcName + "(" + vars + ");\n");
-            } else {
-                emitter.emitToUserFuncDefs(funcName + "(" + vars + ");\n");
-            }
-            EOS();
-
+            parseFunction(isFuncStatement);
 
         } else if (compareToCurToken(Return)) {
             std::cout << "(FUNC)-RETURN STATEMENT\n";
