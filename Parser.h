@@ -281,6 +281,19 @@ private:
         return (type == this->nextToken.getType());
     }
 
+
+    void clrFunctionvars() {
+
+        for (int i = 0; i < variables.size(); ++i) {
+            Variable ithVar = variables[i];
+
+            if (ithVar.getIsFuncVar()){
+                variables.erase(variables.begin() + i);
+            }
+
+        }
+    }
+
     void parseFunction(bool isFuncStatement) {
 
         match(Identifier);
@@ -321,7 +334,7 @@ private:
 
     }
 
-    void parseFunctionBland(bool isFuncStatement){
+    void parseFunctionBland(bool isFuncStatement) {
 
         match(Identifier);
         std::string funcName = lastToken.getTokenText();
@@ -560,7 +573,6 @@ private:
         }
     }
 
-// statement ::= "WRITE" (expression || TK.StringLiteral) TK.Eos || etc...
     void statement(bool isFuncStatement) { // this is the meat of the parser
         // the boolean var input is used to determine where to emit the code. different instances of statement parsing will have different destinations in the output file
 
@@ -569,7 +581,8 @@ private:
             std::cout << "(STATEMENT)-WRITE\n";
             advanceToken();
 
-            // search for string literal, identifier, or  expression
+            // search for string literal, identifier, expression, or function call (of STRING return type)
+            // only these four things are allowed to compile and print, all else will cause break in compiler
             if (compareToCurToken(StringLiteral)) {
 
                 if (!isFuncStatement) {
@@ -599,10 +612,10 @@ private:
                 }
             } else if (compareToCurToken(At)) {
                 advanceToken();
-                if (!isFuncStatement){
+                if (!isFuncStatement) {
                     emitter.emit("printf(\"%s\\n\", ");
                 } else {
-                    emitter.emitToUserFuncDefs( "printf(\"%s\\n\", ");
+                    emitter.emitToUserFuncDefs("printf(\"%s\\n\", ");
                 }
                 parseFunctionBland(isFuncStatement);
 
@@ -639,34 +652,48 @@ private:
             outSource.append("char *" + lastToken.getTokenText());
             match(Eq);
 
-
-//            std::string strLen; // method by which char array of proper size is emitted
+            // search for string literal, string variable, or function call (STRING return type)
             if (compareToCurToken(StringLiteral)) {
                 std::cout << "..LITERAL\n"; // header
 
                 // new way of documenting var
-                Variable str(farBackToken.getTokenText(), curToken.getTokenText(), StringLiteral);
+                Variable str(farBackToken.getTokenText(), curToken.getTokenText(), StringLiteral, isFuncStatement);
                 variables.push_back(str);
                 // ---
 
-                // emitting code
-//                strLen = std::to_string(curToken.getTokenText().length() + 1);
-//                outSource.append("[" + strLen + "] = ");
                 outSource.append(" = \"" + curToken.getTokenText() + "\\0\"");
 
             } else if (compareToCurToken(Identifier)) {
                 std::cout << "..VARIABLE\n"; // header
 
                 // new way of documenting var
-                Variable str(farBackToken.getTokenText(), findVarByName(curToken.getTokenText()));
+                Variable str(farBackToken.getTokenText(), findVarByName(curToken.getTokenText()), isFuncStatement);
                 variables.push_back(str);
                 // ---
-
-//                strLen = std::to_string(str.getValue().length() + 1);
-
-//                outSource.append("[" + strLen + "] = ");
-
                 outSource.append(" = \"" + str.getValue() + "\\0\"");
+            } else if (compareToCurToken(At)) {
+                // document variable for later
+                int startIdx = lexer.getCurPosition(); //read the function call without throwing off lexer
+                std::string startChar = lexer.getCurChar();
+                std::string value = readExpression();
+                lexer.setCurPosition(startIdx);
+                lexer.setCurChar(startChar);
+
+                Variable str (farBackToken.getTokenText(), value, StringLiteral, isFuncStatement);
+                variables.push_back(str);
+                advanceToken();
+                // clear placeholder variables // clrGarbageVars
+
+                if (!isFuncStatement){
+                    emitter.emit("char *" + str.getName() + " = ");
+                } else {
+
+                    emitter.emitToUserFuncDefs("char *" + str.getName() + " = ");
+                }
+                parseFunction(isFuncStatement);
+                return;
+
+
             } else {
                 printf(ANSI_COLOR_CYAN "\nParsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
                 exit(35);
@@ -720,7 +747,7 @@ private:
             identVal = readExpression(); // if this is a float literal, I need to somehow get rid of the fl prefix
 
             // make and save variable object
-            Variable variable(identName, identVal, identType);
+            Variable variable(identName, identVal, identType, isFuncStatement);
             variables.push_back(variable);
 
             if (!isFuncStatement) {
@@ -896,7 +923,7 @@ private:
 
 
                 // make variable
-                Variable variable(varName, varName, StringLiteral);
+                Variable variable(varName, varName, StringLiteral, isFuncStatement);
                 variables.push_back(variable);
 
             } else if (curToken.getType() == NumKW) {
@@ -921,7 +948,7 @@ private:
 
 
                 // make variable
-                Variable variable(varName, varName, FloatLiteral);
+                Variable variable(varName, varName, FloatLiteral, isFuncStatement);
                 variables.push_back(variable);
 
             }
@@ -1014,7 +1041,7 @@ private:
             std::map<std::string, std::string>::iterator it1;
             for (it1 = localVars.begin(); it1 != localVars.end(); it1++) {
                 Variable var(it1->first, "",
-                             (it1->second == "float") ? FloatLiteral : StringLiteral); // name, value, type
+                             (it1->second == "float") ? FloatLiteral : StringLiteral, true); // name, value, type
                 variables.push_back(var);
             }
 
@@ -1044,7 +1071,7 @@ private:
             }
             emitter.emitToUserFuncDefs("}\n");
             EOCB();
-
+            clrFunctionvars();
 
         } else if (compareToCurToken(At)) { // function call
             std::cout << "(CALL-FUNC)\n";

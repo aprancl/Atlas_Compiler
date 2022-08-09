@@ -1,12 +1,18 @@
-
 DEFINE doMath(x:NUM, y:NUM,) $ NUM {
     NUM answer = x + y;
     RETURN answer;
 };
 
 DEFINE sayHi() $ STRING {
-    STRING msg = "Hello!";
+    STRING msg = "Hi!";
     RETURN msg;
+};
+
+CC i want to be able to use <msg> instead of <messg>
+DEFINE sayHello() $ STRING {
+
+    STRING messg = "Hello!";
+    RETURN messg;
 };
 
 
@@ -14,3 +20,7 @@ DEFINE sayHi() $ STRING {
 @sayHi();
 
 WRITE @sayHi();
+
+STRING msg = @sayHello();
+
+WRITE msg;

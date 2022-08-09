@@ -121,3 +121,44 @@ DEFINE makeName() $ STRING {
     RETURN data;
 };
 @makeName();
+
+CC working function return
+
+DEFINE sayHello() $ STRING {
+
+    STRING messg = "Hello!";
+    RETURN messg;
+};
+
+STRING msg = @sayHello();
+
+WRITE msg;
+
+
+CC function practice
+
+DEFINE doMath(x:NUM, y:NUM,) $ NUM {
+    NUM answer = x + y;
+    RETURN answer;
+};
+
+DEFINE sayHi() $ STRING {
+    STRING msg = "Hi!";
+    RETURN msg;
+};
+
+DEFINE sayHello() $ STRING {
+
+    STRING messg = "Hello!";
+    RETURN messg;
+};
+
+
+@doMath(1,2,);
+@sayHi();
+
+WRITE @sayHi();
+
+STRING msg = @sayHello();
+
+WRITE msg;
