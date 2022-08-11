@@ -1,26 +1,16 @@
-DEFINE doMath(x:NUM, y:NUM,) $ NUM {
-    NUM answer = x + y;
-    RETURN answer;
+CC working with functions and numbers
+
+DEFINE giveMeOne() $ NUM {
+    NUM x = 1;
+    RETURN x;
 };
 
-DEFINE sayHi() $ STRING {
-    STRING msg = "Hi!";
-    RETURN msg;
+DEFINE giveMeTwo() $ NUM {
+    NUM y = 2;
+    RETURN y;
 };
 
-CC i want to be able to use <msg> instead of <messg>
-DEFINE sayHello() $ STRING {
+NUM a = @giveMeOne();
+NUM b = @giveMeTwo();
 
-    STRING messg = "Hello!";
-    RETURN messg;
-};
-
-
-@doMath(1,2,);
-@sayHi();
-
-WRITE @sayHi();
-
-STRING msg = @sayHello();
-
-WRITE msg;
+WRITE a + b;

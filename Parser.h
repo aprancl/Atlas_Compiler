@@ -287,13 +287,14 @@ private:
         for (int i = 0; i < variables.size(); ++i) {
             Variable ithVar = variables[i];
 
-            if (ithVar.getIsFuncVar()){
+            if (ithVar.getIsFuncVar()) {
                 variables.erase(variables.begin() + i);
             }
 
         }
     }
 
+    // process the At(@) before calling parseFunction() function
     void parseFunction(bool isFuncStatement) {
 
         match(Identifier);
@@ -679,12 +680,12 @@ private:
                 lexer.setCurPosition(startIdx);
                 lexer.setCurChar(startChar);
 
-                Variable str (farBackToken.getTokenText(), value, StringLiteral, isFuncStatement);
+                Variable str(farBackToken.getTokenText(), value, StringLiteral, isFuncStatement);
                 variables.push_back(str);
                 advanceToken();
                 // clear placeholder variables // clrGarbageVars
 
-                if (!isFuncStatement){
+                if (!isFuncStatement) {
                     emitter.emit("char *" + str.getName() + " = ");
                 } else {
 
@@ -725,17 +726,18 @@ private:
             } else if (compareToCurToken(Identifier)) {
                 identName = curToken.getTokenText();
                 advanceToken();
-                outSource.append(lastToken.getTokenText() + " ");
+                outSource.append(identName);
             }
 
             // check '='
             match(Eq);
-            outSource.append("= ");
+            outSource.append(" = ");
+            bool funcCallFlag = compareToCurToken(At);
 
             // emit && document data type and value
             std::string identVal;
             TokenType identType;
-            if (isVarFloat()) {
+            if (isVarFloat() || funcCallFlag) {
                 outSource.insert(0, "float ");
                 identType = FloatLiteral;
             } else {
@@ -743,21 +745,35 @@ private:
                 identType = IntLiteral;
             }
 
-            // this is the line that stops the function doMath()
             identVal = readExpression(); // if this is a float literal, I need to somehow get rid of the fl prefix
 
             // make and save variable object
             Variable variable(identName, identVal, identType, isFuncStatement);
             variables.push_back(variable);
 
+            // emitting output
             if (!isFuncStatement) {
-                emitter.emit(outSource);
-                expression(isFuncStatement);
-                emitter.emit(";\n");
+                if (funcCallFlag){
+                    emitter.emit(outSource);
+                    advanceToken();
+                    parseFunction(isFuncStatement);
+                    return;
+                } else {
+                    emitter.emit(outSource);
+                    expression(isFuncStatement);
+                    emitter.emit(";\n");
+                }
             } else {
-                emitter.emitToUserFuncDefs(outSource);
-                expression(isFuncStatement);
-                emitter.emitToUserFuncDefs(";\n");
+                if (funcCallFlag){
+                    emitter.emitToUserFuncDefs(outSource);
+                    advanceToken();
+                    parseFunction(isFuncStatement);
+                    return;
+                } else {
+                    emitter.emitToUserFuncDefs(outSource);
+                    expression(isFuncStatement);
+                    emitter.emitToUserFuncDefs(";\n");
+                }
             }
 
             EOS();

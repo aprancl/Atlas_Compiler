@@ -137,6 +137,7 @@ WRITE msg;
 
 CC function practice
 
+
 DEFINE doMath(x:NUM, y:NUM,) $ NUM {
     NUM answer = x + y;
     RETURN answer;
@@ -147,6 +148,7 @@ DEFINE sayHi() $ STRING {
     RETURN msg;
 };
 
+CC i want to be able to use <msg> instead of <messg>
 DEFINE sayHello() $ STRING {
 
     STRING messg = "Hello!";

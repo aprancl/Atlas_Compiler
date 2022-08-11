@@ -1,26 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-float doMath(float x,float y) {
-float answer = x + y;
-return answer;
+
+float giveMeOne() {
+    int x = 1;
+    return x;
 }
-char* sayHi() {
-char *msg = "Hi!\0";
-return msg;
+
+float giveMeTwo() {
+    int y = 2;
+    return y;
 }
-char* sayHello() {
-char *messg = "Hello!\0";
-return messg;
-}
+
 int main() {
 
 
-//  i want to be able to use <msg> instead of <messg>
-doMath(1,2);
-sayHi();
-printf("%s\n", sayHi());
-char *msg = sayHello();
-printf("%s\n",msg);
+//  working with functions and numbers
+    float a = giveMeOne();
+    float b = giveMeTwo();
+    printf("%.2f\n", (float) (a + b));
 
-return 0;
+    return 0;
 }
