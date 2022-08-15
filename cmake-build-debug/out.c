@@ -1,23 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-float giveMeOne() {
-    int x = 1;
-    return x;
-}
-
 float giveMeTwo() {
-    int y = 2;
-    return y;
+int y = 2;
+return y;
 }
-
 int main() {
 
 
-//  working with functions and numbers
-    float a = giveMeOne();
-    float b = giveMeTwo();
-    printf("%.2f\n", (float) (a + b));
+//  variable reassignment testing
+int sum = 0;
+int x = 1;
+x = 4;
+sum = sum + x;
+x = giveMeTwo();
+char *name = "Anthony\0";
+//  problem
+printf("%s\n",name);
 
-    return 0;
+return 0;
 }

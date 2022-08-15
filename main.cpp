@@ -4,7 +4,7 @@
 #include "Emitter.h"
 #include <map>
 #include <fstream>
-// TODO keep going down the statement() and allowing for using of function calls. also address local var problems when can
+// TODO (polish, but important polish) variables within a function should be disposed of after their use
 //TODO (polish) dont allow variable reassignment of an int to float  and float to int <-- causes inaccuracies
 //TODO (polish)Fix the way that float literal are saved. install of "fl3.14" it should just be 3.14
 

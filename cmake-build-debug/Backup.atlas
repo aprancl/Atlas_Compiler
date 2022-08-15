@@ -164,3 +164,41 @@ WRITE @sayHi();
 STRING msg = @sayHello();
 
 WRITE msg;
+
+
+
+CC working with functions and numbers
+
+DEFINE giveMeOne() $ NUM {
+    NUM x = 1;
+    RETURN x;
+};
+
+DEFINE giveMeTwo() $ NUM {
+    NUM y = 2;
+    RETURN y;
+};
+
+NUM a = @giveMeOne();
+NUM b = @giveMeTwo();
+
+WRITE a + b;
+
+CC variable reassignment testing
+
+DEFINE giveMeTwo() $ NUM {
+    NUM y = 2;
+    RETURN y;
+};
+
+
+NUM sum = 0;
+
+NUM x = 1;
+x = 4;
+sum = sum + x;
+x = @giveMeTwo();
+STRING name = "Anthony";
+
+WRITE name;
+

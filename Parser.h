@@ -243,7 +243,7 @@ private:
 
             std::string varName = identifier.getTokenText();
             for (int i = 0; i < variables.size(); ++i) {
-                if (identifier.getTokenText() == varName) {
+                if (variables[i].getName() == varName) {
                     return variables[i].getDataType();
                 }
             }
@@ -753,7 +753,7 @@ private:
 
             // emitting output
             if (!isFuncStatement) {
-                if (funcCallFlag){
+                if (funcCallFlag) {
                     emitter.emit(outSource);
                     advanceToken();
                     parseFunction(isFuncStatement);
@@ -764,7 +764,7 @@ private:
                     emitter.emit(";\n");
                 }
             } else {
-                if (funcCallFlag){
+                if (funcCallFlag) {
                     emitter.emitToUserFuncDefs(outSource);
                     advanceToken();
                     parseFunction(isFuncStatement);
@@ -994,44 +994,62 @@ private:
                 exit(35);
             }
 
-            // get the variable that needs to be manipulated and save another copy for comparison
-            Variable originVar = findVarByName(curToken.getTokenText());
+            //the variable literal that needs to be manipulated
             Variable *varPtr = findVarPtrByName(curToken.getTokenText());
             advanceToken();
 
             match(Eq);
 
             // potential things found at end of "="
+
             // string literal
-            if (curToken.getType() == StringLiteral && originVar.getDataType() == StringLiteral) {
+            if (curToken.getType() == StringLiteral && varPtr->getDataType() == StringLiteral) {
                 varPtr->setValue(curToken.getTokenText());
 
                 if (!isFuncStatement) {
-                    emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\\0\"");
+                    emitter.emit(varPtr->getName() + " = \"" + varPtr->getValue() + "\\0\"");
                 } else {
-                    emitter.emitToUserFuncDefs(originVar.getName() + " = \"" + varPtr->getValue() + "\\0\"");
+                    emitter.emitToUserFuncDefs(varPtr->getName() + " = \"" + varPtr->getValue() + "\\0\"");
                 }
                 advanceToken();
             }
                 // string variable
             else if (curToken.getType() == Identifier && varPtr->getDataType() == StringLiteral &&
-                     originVar.getDataType() == StringLiteral) {
+                     varPtr->getDataType() == StringLiteral) {
 
                 varPtr->setPtrVar(findVarByName(curToken.getTokenText()));
 
                 if (!isFuncStatement) {
-                    emitter.emit(originVar.getName() + " = \"" + varPtr->getValue() + "\"");
+                    emitter.emit(varPtr->getName() + " = \"" + varPtr->getValue() + "\"");
                 } else {
-                    emitter.emitToUserFuncDefs(originVar.getName() + " = \"" + varPtr->getValue() + "\"");
+                    emitter.emitToUserFuncDefs(varPtr->getName() + " = \"" + varPtr->getValue() + "\"");
                 }
                 advanceToken();
-            } else {
+            }
+                // function call
+            else if (compareToCurToken(At)) {
+
+                if (!isFuncStatement) {
+                    advanceToken();
+                    emitter.emit(varPtr->getName() + " = ");
+                    parseFunction(isFuncStatement);
+                    return;
+                } else {
+                    advanceToken();
+                    emitter.emitToUserFuncDefs(varPtr->getName() + " = ");
+                    parseFunction(isFuncStatement);
+                    return;
+                }
+
+            }
+                // expressions
+            else {
                 varPtr->setValue(readExpression());
 
                 if (!isFuncStatement) {
-                    emitter.emit(originVar.getName() + " = ");
+                    emitter.emit(varPtr->getName() + " = ");
                 } else {
-                    emitter.emitToUserFuncDefs(originVar.getName() + " = ");
+                    emitter.emitToUserFuncDefs(varPtr->getName() + " = ");
                 }
                 std::string exprVal = readExpression();
 
