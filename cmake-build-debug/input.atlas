@@ -1,8 +1,28 @@
-STRING name = "Anthony";
+CC This is a program that will search for a given pattern in a string of text
 
-STRING newName = [2..4]name;
 
-WRITE newName;
+DEFINE length(s:STRING,) $ NUM {
+
+    NUM len = 0;
+    FOR [s] {
+        len = len + 1;
+    };
+
+    RETURN len;
+};
+
+
+INPUT STRING source;
+INPUT STRING target;
+
+NUM lenOfInput =  @length(source,);
+
+NUM i = -1;
+FOR [lenOfInput] {
+    i = i + 1;
+    STRING letter = [i..i]source;
+    WRITE letter;
+};
 
 
 

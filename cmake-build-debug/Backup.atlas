@@ -202,3 +202,17 @@ STRING name = "Anthony";
 
 WRITE name;
 
+
+CC String slicing practice
+
+
+STRING name = "Anthony";
+
+NUM x = 2;
+NUM y = 4;
+STRING newName = [x..y]name;
+
+WRITE newName;
+
+
+

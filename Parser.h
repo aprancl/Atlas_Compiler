@@ -724,7 +724,7 @@ private:
                     exit(35);
                 }
 
-                // get starting and ending indicies
+                // get starting and ending indices
                 std::string startIndex = (compareToCurToken(Identifier)) ? findVarByName(
                         curToken.getTokenText()).getValue() : curToken.getTokenText();
                 advanceToken();
@@ -739,14 +739,14 @@ private:
                 std::string targetString = (compareToCurToken(Identifier)) ? findVarByName(
                         curToken.getTokenText()).getValue() : curToken.getTokenText();
 
-                std::string empty = "";// not sure why this removes error...
+//                std::string empty = "";// not sure why this removes error... // so its gone now ?
                 if (!isFuncStatement) {
                     emitter.emit(
-                            outSource + " = sliceString(" + empty + "\"" + targetString + "\"" + ", " + startIndex +
+                            outSource + " = sliceString("  + "\"" + targetString + "\"" + ", " + startIndex +
                             ", " + endIndex + ");");
                 } else {
                     emitter.emitToUserFuncDefs(
-                            outSource + " = sliceString(" + empty + "\"" + targetString + "\"" + ", " + startIndex +
+                            outSource + " = sliceString("  + "\"" + targetString + "\"" + ", " + startIndex +
                             ", " + endIndex + ");");
                 }
                 advanceToken();
