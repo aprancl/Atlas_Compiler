@@ -116,6 +116,10 @@ private:
         std::string returnType;
         // skip to dollar sign
         while (lexer.getCurChar() != "$") {
+            if (lexer.getCurChar() == "\0") {
+                printf(ANSI_COLOR_CYAN"\nParsing error..function declaration missing return type\n");
+                exit(35);
+            }
             lexer.nextChar();
         }
         lexer.nextChar();
@@ -695,6 +699,59 @@ private:
                 return;
 
 
+            } else if (compareToCurToken(SqrbraceL)) { // string slicing
+                advanceToken();
+                emitter.appendStringSliceMethod();
+
+                // document variable
+                std::string name = outSource.substr(6);
+
+                int startPosition = lexer.getCurPosition();
+                std::string startChar = lexer.getCurChar();
+                std::string value = readExpression();
+                lexer.setCurPosition(startPosition);
+                lexer.setCurChar(startChar);
+
+                Variable variable(name, value, StringLiteral, isFuncStatement);
+                variables.push_back(variable);
+
+
+                // if we find a string or a variable of string type, abort
+                if (compareToCurToken(StringLiteral) || (compareToCurToken(Identifier) &&
+                                                         findVarByName(curToken.getTokenText()).getDataType() ==
+                                                         StringLiteral)) {
+                    printf(ANSI_COLOR_CYAN "\nParsing error..string slicing must must be performed with integers and floats\n");
+                    exit(35);
+                }
+
+                // get starting and ending indicies
+                std::string startIndex = (compareToCurToken(Identifier)) ? findVarByName(
+                        curToken.getTokenText()).getValue() : curToken.getTokenText();
+                advanceToken();
+                match(Period);
+                match(Period);
+                std::string endIndex = (compareToCurToken(Identifier)) ? findVarByName(
+                        curToken.getTokenText()).getValue() : curToken.getTokenText();
+
+                advanceToken();
+                match(SqrbraceR);
+
+                std::string targetString = (compareToCurToken(Identifier)) ? findVarByName(
+                        curToken.getTokenText()).getValue() : curToken.getTokenText();
+
+                std::string empty = "";// not sure why this removes error...
+                if (!isFuncStatement) {
+                    emitter.emit(
+                            outSource + " = sliceString(" + empty + "\"" + targetString + "\"" + ", " + startIndex +
+                            ", " + endIndex + ");");
+                } else {
+                    emitter.emitToUserFuncDefs(
+                            outSource + " = sliceString(" + empty + "\"" + targetString + "\"" + ", " + startIndex +
+                            ", " + endIndex + ");");
+                }
+                advanceToken();
+                EOS();
+                return;
             } else {
                 printf(ANSI_COLOR_CYAN "\nParsing error..must assign literal of type <STRING> to identifier of type <STRING>\n");
                 exit(35);

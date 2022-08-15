@@ -31,6 +31,7 @@ enum TokenType {
     Bslash = 199,
     At = 198,
     Comma = 197,
+    Period = 21,
 
 
     // DATA TYPES
@@ -130,6 +131,7 @@ public:
         typeMap[18] = "NotEq";
         typeMap[19] = "GtEq";
         typeMap[20] = "LtEq";
+        typeMap[21] = "Period";
         typeMap[25] = "IntKW";
         typeMap[50] = "FloKW";
         typeMap[75] = "StringKW";
@@ -276,6 +278,8 @@ public:
             token = new Token(curChar, At);
         } else if (curChar == ",") {
             token = new Token(curChar, Comma);
+        } else if (curChar == ".") {
+            token = new Token(curChar, Period);
         }
             // length 2 tokens (mostly boolean comparison operators)
         else if (curChar == "=") { // equals and equal-equals

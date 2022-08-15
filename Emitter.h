@@ -11,7 +11,24 @@
 #include <fstream>
 #include "Lexer.h"
 
+/*
+char *sliceString(char *str, int start, int end)
+{
 
+    int i;
+    int size = (end - start) + 2;
+    char *output = (char *)malloc(size * sizeof(char));
+
+    for (i = 0; start <= end; start++, i++)
+    {
+        output[i] = str[start];
+    }
+
+    output[size] = '\0';
+
+    return output;
+}
+*/
 
 class Emitter {
 
@@ -55,6 +72,11 @@ public:
 
     void emitToUserFuncDefs(std::string outSource) {
         this->userFuncDefs += outSource;
+    }
+
+    void appendStringSliceMethod() {
+        userFuncDefs.insert(0,
+                            "char *sliceString(char *str, int start, int end) {\nint i;\nint size = (end - start) + 2;\nchar *output = (char *) malloc(size * sizeof(char));\nfor (i = 0; start <= end; start++, i++) {\noutput[i] = str[start];\n\n}\noutput[size] = '\\0';\nreturn output;\n\n}\n");
     }
 
     // other methods

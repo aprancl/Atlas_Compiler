@@ -1,21 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-float giveMeTwo() {
-int y = 2;
-return y;
+
+char *sliceString(char *str, int start, int end) {
+    int i;
+    int size = (end - start) + 2;
+    char *output = (char *) malloc(size * sizeof(char));
+    for (i = 0; start <= end; start++, i++) {
+        output[i] = str[start];
+
+    }
+    output[size] = '\0';
+    return output;
+
 }
+
 int main() {
 
 
-//  variable reassignment testing
-int sum = 0;
-int x = 1;
-x = 4;
-sum = sum + x;
-x = giveMeTwo();
-char *name = "Anthony\0";
-//  problem
-printf("%s\n",name);
+    char *name = "Anthony\0";
+    char *newName = sliceString("Anthony", 2, 4);
+    printf("%s\n", newName);
 
-return 0;
+    return 0;
 }

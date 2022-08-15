@@ -1,0 +1,25 @@
+CC This is a program that will search for a given pattern in a string of text
+
+
+DEFINE length(s:STRING,) $ NUM {
+
+    NUM len = 0;
+    FOR [s]{
+        len = len + 1;
+    };
+
+    RETURN len;
+};
+
+DEFINE slice(startIndex:NUM, length:NUM, string:STRING,) $ STRING {
+
+
+
+
+    RETURN "B";
+};
+
+
+INPUT STRING source;
+INPUT STRING target;
+
