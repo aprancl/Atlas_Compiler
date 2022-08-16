@@ -726,27 +726,27 @@ private:
 
                 // get starting and ending indices
                 std::string startIndex = (compareToCurToken(Identifier)) ? findVarByName(
-                        curToken.getTokenText()).getValue() : curToken.getTokenText();
+                        curToken.getTokenText()).getName() : curToken.getTokenText();
                 advanceToken();
                 match(Period);
                 match(Period);
                 std::string endIndex = (compareToCurToken(Identifier)) ? findVarByName(
-                        curToken.getTokenText()).getValue() : curToken.getTokenText();
+                        curToken.getTokenText()).getName() : curToken.getTokenText();
 
                 advanceToken();
                 match(SqrbraceR);
 
                 std::string targetString = (compareToCurToken(Identifier)) ? findVarByName(
-                        curToken.getTokenText()).getValue() : curToken.getTokenText();
+                        curToken.getTokenText()).getValue() : "\"" + curToken.getTokenText() + "\"";
 
 //                std::string empty = "";// not sure why this removes error... // so its gone now ?
                 if (!isFuncStatement) {
                     emitter.emit(
-                            outSource + " = sliceString("  + "\"" + targetString + "\"" + ", " + startIndex +
+                            outSource + " = sliceString("  +  targetString  + ", " + startIndex +
                             ", " + endIndex + ");");
                 } else {
                     emitter.emitToUserFuncDefs(
-                            outSource + " = sliceString("  + "\"" + targetString + "\"" + ", " + startIndex +
+                            outSource + " = sliceString(" + targetString + ", " + startIndex +
                             ", " + endIndex + ");");
                 }
                 advanceToken();

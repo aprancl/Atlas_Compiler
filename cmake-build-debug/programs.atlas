@@ -18,8 +18,6 @@ INPUT STRING target;
 
 // program idea but in java ...
 
-// Use this editor to write, compile and run your Java code online
-
 import java.util.*;
 
 class HelloWorld {
@@ -31,19 +29,21 @@ class HelloWorld {
         System.out.print("Please enter the target pattern:");
         String target = sc.nextLine();
 
-        int step = source.length() / target.length();
+        int step = target.length();
+
 
         int patternCounter = 0;
-        for(int i = 0; i < source.length(); i += step){
+        for (int i = 0; i < source.length(); i += step){
 
-            if (i + step - 1 > source.length()){
+            if (step > source.length() - i){
                 break;
             }
 
             int counter = 0;
             String snipet = "";
             for (int j = i; counter < step; j++ ){
-                snipet +=String.valueOf(source.charAt(j));
+                snipet += String.valueOf(source.charAt(j));
+                counter += 1;
             }
 
             if (snipet.equals(target)){
@@ -53,6 +53,7 @@ class HelloWorld {
 
 
         }
+        System.out.println(patternCounter);
 
     }
 }

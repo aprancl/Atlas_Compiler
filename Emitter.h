@@ -30,6 +30,16 @@ char *sliceString(char *str, int start, int end)
 }
 */
 
+/*
+float length(char* string){
+    int counter = 0;
+    char curChar = &first;
+    while (curChar != '\0'){
+        counter ++;
+        curChar = first[ counter];
+}
+ */
+
 class Emitter {
 
 private:

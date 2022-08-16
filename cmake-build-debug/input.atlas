@@ -17,11 +17,12 @@ INPUT STRING target;
 
 NUM lenOfInput =  @length(source,);
 
-NUM i = -1;
+NUM it = 0;
 FOR [lenOfInput] {
-    i = i + 1;
-    STRING letter = [i..i]source;
+    STRING letter = [it..it]source;
     WRITE letter;
+    it = it + 1;
+
 };
 
 
