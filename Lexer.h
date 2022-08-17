@@ -43,6 +43,7 @@ enum TokenType {
     Keyword = 99, // this is too generic
     Write = 100, // this is the print function
     If = 101,
+    Else = -101,
     Input = 102,
     While = 104,
     For = 105,
@@ -141,6 +142,7 @@ public:
         typeMap[199] = "Bslash";
         typeMap[100] = "Write";
         typeMap[101] = "If";
+        typeMap[-101] = "Else";
         typeMap[102] = "Input";
         typeMap[103] = "Cc";
         typeMap[104] = "While";
@@ -185,7 +187,7 @@ private:
 
 
     int isKeyWord(std::string text) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE", "RETURN"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE", "RETURN", "ELSE"};
 
         for (std::string keyWord: key_words) {
             if (keyWord == text) {
@@ -197,7 +199,7 @@ private:
     }
 
     TokenType getThisKeyword(std::string tokenText) {
-        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE", "RETURN"};
+        std::string key_words[] = {"WRITE", "INPUT", "IF", "WHILE", "STRING", "NUM", "FOR", "DEFINE", "RETURN", "ELSE"};
 
         if (tokenText == key_words[0]) {
             return Write;
@@ -217,6 +219,8 @@ private:
             return Define;
         } else if (tokenText == key_words[8]) {
             return Return;
+        } else if (tokenText == key_words[9]) {
+            return Else;
         } else {
             return None; // this shouldn't happen
         }

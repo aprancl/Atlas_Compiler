@@ -31,12 +31,17 @@ char *sliceString(char *str, int start, int end)
 */
 
 /*
-float length(char* string){
+float length(char* a){
+
+    char curChar = &a;
     int counter = 0;
-    char curChar = &first;
     while (curChar != '\0'){
-        counter ++;
-        curChar = first[ counter];
+        counter++;
+        curChar = a[counter];
+
+    }
+
+    return counter;
 }
  */
 

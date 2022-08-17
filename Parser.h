@@ -742,7 +742,7 @@ private:
 //                std::string empty = "";// not sure why this removes error... // so its gone now ?
                 if (!isFuncStatement) {
                     emitter.emit(
-                            outSource + " = sliceString("  +  targetString  + ", " + startIndex +
+                            outSource + " = sliceString(" + targetString + ", " + startIndex +
                             ", " + endIndex + ");");
                 } else {
                     emitter.emitToUserFuncDefs(
@@ -865,6 +865,30 @@ private:
                 emitter.emit(")\n{\n");
             } else {
                 emitter.emitToUserFuncDefs(")\n{\n");
+            }
+
+            // execute all statements in the code block
+            while (!compareToCurToken(CrlbraceR)) { // this kind of hurts my brain, but it works
+                statement(isFuncStatement);
+            }
+            EOCB();
+
+            if (!isFuncStatement) {
+                emitter.emit("\n}\n");
+            } else {
+                emitter.emitToUserFuncDefs("\n}\n");
+            }
+
+        } else if (compareToCurToken(Else)) {
+            std::cout << "(STATEMENT)-ELSE_CONDITION\n";
+
+            advanceToken();
+            match(CrlbraceL);
+
+            if (!isFuncStatement) {
+                emitter.emit("else {\n");
+            } else {
+                emitter.emitToUserFuncDefs("else {\n");
             }
 
             // execute all statements in the code block

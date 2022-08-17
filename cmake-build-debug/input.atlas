@@ -1,29 +1,25 @@
-CC This is a program that will search for a given pattern in a string of text
+CC recursive factorial program in atlas
 
+DEFINE factorial (n:NUM,) $ NUM {
+    CC returns n! factorial
 
-DEFINE length(s:STRING,) $ NUM {
-
-    NUM len = 0;
-    FOR [s] {
-        len = len + 1;
+    IF [n == 0]{
+        RETURN 1;
     };
 
-    RETURN len;
-};
+    ELSE {
+        NUM x = n - 1;
+        NUM temp = @factorial(x,);
+        RETURN  n * temp;
+    };
 
-
-INPUT STRING source;
-INPUT STRING target;
-
-NUM lenOfInput =  @length(source,);
-
-NUM it = 0;
-FOR [lenOfInput] {
-    STRING letter = [it..it]source;
-    WRITE letter;
-    it = it + 1;
+    RETURN 1;
 
 };
 
+WRITE "Please enter a number below";
+INPUT NUM in;
 
+NUM answer = @factorial(in,);
 
+WRITE answer;
