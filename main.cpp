@@ -54,32 +54,3 @@ int main() {
 }
 
 
-
-// old versions of main function I don't want to lose quite yet
-
-
-//while (lexer.lookAhead() != "\0"){ // "\0" is EOF
-//std::cout << lexer.getCurChar() << std::endl;
-//lexer.nextChar();
-//}
-
-// test source tokens
-//+=>>=- <==!=*/==!= +++CCabc+++   +1INT-2"Hello world"*123"Hello again0
-// IF+-123 foo*WHILE/"Anthony"+=>>=- <==!=*/==!= +++CCabc+++ ;  +1INT-2"Hello world"*123"Hello again0"
-//
-
-
-
-
-//std::string input = getSource("input.atlas");
-//Lexer lexer(input);
-//
-//Token token = lexer.getToken();
-//while (token.getType() != Eof) { // "\0" is EOF
-//
-//if (token.getType() != Space) { // just ignore the spaces for now, they don't do anything
-//std::cout << token.getType() << " " << Token::typeToString(token.getType()) << std::endl;
-//}
-//
-//token = lexer.getToken();
-//}
