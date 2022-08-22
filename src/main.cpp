@@ -39,11 +39,11 @@ int main() {
     std::cout << "🌐 ATLAS COMPILER\n";
 
     // save the source code from the input file as a long string of text
-    std::string input = getSource("input.atlas");
+    std::string input = getSource("/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/io/input.atlas");
 
     // create necessary object
     Lexer lexer(input);
-    Emitter emitter("/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug/out.c");
+    Emitter emitter("/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/io/out.c");
     Parser parser(lexer, emitter);
 
 

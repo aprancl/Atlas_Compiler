@@ -36,7 +36,6 @@ enum TokenType {
 
     // DATA TYPES
     NumKW = 25, // this will need to be refactored to keyword NUM
-    FloKW = 50,
     StringKW = 75,
 
     // KEYWORDS...
@@ -50,7 +49,7 @@ enum TokenType {
     Define = 8,
     Return = 9,
 
-    // Objects
+    // 'Objects'
     IntLiteral = 2,
     StringLiteral = 3,
     FloatLiteral = 7,
@@ -99,7 +98,6 @@ public:
     }
 
 
-    // band-aid solution to minor issue of representing what a given type is...
     // enum types where prints as numbers not name of type
     static std::string typeToString(int tokenType) {
         std::map<int, std::string> typeMap;

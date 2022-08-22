@@ -1254,9 +1254,9 @@ public:
         emitter.writeFile();
         std::cout << "🌐 parsing complete\n";
         std::cout << "\n-OUTPUT-\n";
-        system("clang out.c -o a.out && ./a.out");
+        system("cd ..; cd io;clang out.c -o a.out && ./a.out");
     }
-
+// clang out.c -o a.out && ./a.out
 
 };
 
