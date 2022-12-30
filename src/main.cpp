@@ -4,6 +4,7 @@
 #include "Emitter.h"
 #include <map>
 #include <fstream>
+// test 1 2 3 is git working now?
 // TODO (polish, but important polish) variables within a function should be disposed of after their use
 //TODO (polish) dont allow variable reassignment of an int to float  and float to int <-- causes inaccuracies
 //TODO (polish)Fix the way that float literal are saved. install of "fl3.14" it should just be 3.14
