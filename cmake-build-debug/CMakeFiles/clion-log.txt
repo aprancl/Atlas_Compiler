@@ -1,39 +1,16 @@
 /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S "/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler" -B "/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug"
--- The C compiler identification is unknown
--- The CXX compiler identification is unknown
+-- The C compiler identification is AppleClang 14.0.0.14000029
+-- The CXX compiler identification is AppleClang 14.0.0.14000029
 -- Detecting C compiler ABI info
--- Detecting C compiler ABI info - failed
--- Check for working C compiler: /usr/bin/cc
--- Check for working C compiler: /usr/bin/cc - broken
-CMake Error at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.23/Modules/CMakeTestCCompiler.cmake:69 (message):
-  The C compiler
-
-    "/usr/bin/cc"
-
-  is not able to compile a simple test program.
-
-  It fails with the following output:
-
-    Change Dir: /Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug/CMakeFiles/CMakeTmp
-    
-    Run Build Command(s):/Applications/CLion.app/Contents/bin/ninja/mac/ninja cmTC_bdd21 && [1/2] Building C object CMakeFiles/cmTC_bdd21.dir/testCCompiler.c.o
-    FAILED: CMakeFiles/cmTC_bdd21.dir/testCCompiler.c.o 
-    /usr/bin/cc   -arch arm64 -o CMakeFiles/cmTC_bdd21.dir/testCCompiler.c.o -c '/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug/CMakeFiles/CMakeTmp/testCCompiler.c'
-    xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun
-    ninja: build stopped: subcommand failed.
-    
-    
-
-  
-
-  CMake will not be able to correctly generate this project.
-Call Stack (most recent call first):
-  CMakeLists.txt:2 (project)
-
-
--- Configuring incomplete, errors occurred!
-See also "/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug/CMakeFiles/CMakeOutput.log".
-See also "/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug/CMakeFiles/CMakeError.log".
-
-Cannot get compiler information:
-	Cannot run program "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++" (in directory "/Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug"): error=2, No such file or directory
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/anthonyprancl/Documents/Classes/Summer Project/Atlas Compiler/cmake-build-debug
