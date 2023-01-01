@@ -3,7 +3,7 @@
 ## Description
 A source-to-source compiler that translates my languages, ATLAS, into C source code. I decided to embark on this project to learn more about: what happens when something is compiled, how C++ and C work, and what it means to design a good programming language.     
 
-## Structure 
+## Logical Components 
 #### Consists of:
 - Lexer (Tokenizer)
 - Parser
@@ -43,3 +43,19 @@ unary ::= ["+" || "-"]primary <br>
 primary ::= TK.StringLiteral || TK.identifier || TK.FloatLiteral <br>
 TK.Eos = ";" End Of Statement -> EOS <br>
 
+
+## Key Words
+
+- WRITE
+- IF
+- ELSE
+- INPUT
+- WHILE
+- FOR
+- DEFINE
+- RETURN
+- CC
+- fl
+- INT
+- FLOAT
+- STRING
