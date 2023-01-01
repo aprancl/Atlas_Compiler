@@ -65,9 +65,9 @@ IF [n == 0]{
     };
 
 ELSE {
-    NUM x = n - 1;
-    NUM temp = @factorial(x,); CC calls function and saves value to temp
-    RETURN  n * temp;
+    NUM x = n * 10;
+    NUM temp = @mystery(x,); CC calls function and saves value to temp
+    RETURN  n * temp + 4;
 };
 ```
 - INPUT - takes input from user
