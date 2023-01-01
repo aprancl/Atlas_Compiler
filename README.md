@@ -46,16 +46,127 @@ TK.Eos = ";" End Of Statement -> EOS <br>
 
 ## Key Words
 
-- WRITE
-- IF
-- ELSE
-- INPUT
-- WHILE
-- FOR
-- DEFINE
-- RETURN
-- CC
-- fl
-- INT
-- FLOAT
-- STRING
+- CC - denotes a comment
+- WRITE - standard output function
+```javascript
+WRITE "hello world"; CC this will print the given string literal
+WRITE a * b + c; CC expressions and variables work as well
+```
+- IF - conditional branch
+```javascript
+IF [n >= 5]{
+    WRITE "n is not 3";
+};
+```
+- ELSE - conditional branch
+```javascript
+IF [n == 0]{
+        RETURN 1;
+    };
+
+ELSE {
+    NUM x = n - 1;
+    NUM temp = @factorial(x,); CC calls function and saves value to temp
+    RETURN  n * temp;
+};
+```
+- INPUT - takes input from user
+```javascript
+INPUT STRING name; CC INPUT <Data Type> <Variable Name>
+```
+WHILE - loop type
+```javascript
+CC Print all positive numbers less than a given n
+INPUT NUM n;
+NUM i = 0;
+
+WHILE [ i < n]{
+  WRITE i;
+  i = i + 1;
+};
+```
+- FOR - loop type
+```javascript
+
+CC you can loop for a given amount of times 
+INPUT NUM x;
+
+FOR [x]{
+    WRITE "Hello";
+};
+
+CC you can also loop for the length of a string
+
+FOR ["Strawberry"]{
+    WRITE x;
+};
+```
+- DEFINE - used to define a function
+```javascript
+
+CC DEFINE is followed by the function name
+CC within the parameters of the function, local 
+CC variable names and datatypes are seperated by a colon 
+CC all local parameters are ended by a comma 
+CC following the dollar sign, we have the return type
+DEFINE factorial (n:NUM,) $ NUM {
+  CC returns n! factorial
+
+  IF [n == 0]{
+    RETURN 1;
+  };
+
+  ELSE {
+    NUM x = n - 1;
+    NUM temp = @factorial(x,);
+    RETURN  n * temp;
+  };
+
+  RETURN 1;
+
+};
+
+```
+- RETURN - returns a values within a function
+- NUM - a data type 
+```javascript
+CC all numbers in ATLAS are assumed to be integers unless otherwise specified
+NUM x  = 10;
+```
+- fl - used to specify a float literal
+```javascript
+NUM pi = fl3.14;
+```
+- STRING - a data type
+```javascript
+STRING name = "Anthony";
+```
+- @ - designates a function call 
+```javascript
+CC here we have our factorial function again
+DEFINE factorial (n:NUM,) $ NUM {
+  CC returns n! factorial
+
+  IF [n == 0]{
+    RETURN 1;
+  };
+
+  ELSE {
+    NUM x = n - 1;
+    NUM temp = @factorial(x,); CC recursive call
+    RETURN  n * temp;
+  };
+
+  RETURN 1;
+
+};
+
+
+WRITE "Please enter a number below";
+INPUT NUM in;
+
+NUM answer = @factorial(in,); CC call with variable input
+
+WRITE answer;
+
+```
